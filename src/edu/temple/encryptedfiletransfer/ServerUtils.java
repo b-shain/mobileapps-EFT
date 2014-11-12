@@ -40,23 +40,27 @@ import android.app.Activity;
 	         
 	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
 	        // Once GCM returns a registration id, we need to register on our server
-	        // As the server might be down, we will retry it a couple
-	        // times.
+	        // Since server might be down, we will retry it a few times.
 	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {
 	            Log.d(TAG, "Attempt #" + i + " to register");
 	            try {
 	                //displayMessage(context, context.getString(R.string.server_registering, i, MAX_ATTEMPTS));
-	                displayMessage(context, "server is registering");
+	            	//TODO create non-hardcoded string
+	            	displayMessage(context, "server is registering");
 	            	post(serverUrl, params);
+	            	
+	            	//These lines are for registering the device with GCM, which is handled elsewhere now
 	                //GCMRegistrar.setRegisteredOnServer(context, true);
+	            	
+	            	//TODO create non-hardcoded string
 	                //String message = context.getString(R.string.server_registered);
+	            	
 		            String message = "This device has been registered.";
 	                Utilities.displayMessage(context, message);
 	                return;
 	            } catch (IOException e) {
-	                // Here we are simplifying and retrying on any error; in a real
-	                // application, it should retry only on unrecoverable errors
-	                // (like HTTP error code 503).
+	                // Here we are simplifying and retrying on any error
+	            	
 	                Log.e(TAG, "Failed to register on attempt " + i + ":" + e);
 	                if (i == MAX_ATTEMPTS) {
 	                    break;
@@ -75,6 +79,7 @@ import android.app.Activity;
 	            }
 	        }
 	        //String message = context.getString(R.string.server_register_error,MAX_ATTEMPTS);
+	        //TODO create non-hardcoded string
 	        String message = "server_register_error";
 	        Utilities.displayMessage(context, message);
 	    }
@@ -89,8 +94,12 @@ import android.app.Activity;
 	        params.put("GCM_Reg_ID", GCM_Reg_ID);
 	        try {
 	            post(serverUrl, params);
+	            
+	            //This line is for un-registering the device with GCM, which is not handled currently, but should be handled elsewhere
 	            //GCMRegistrar.setRegisteredOnServer(context, false);
+	            
 	            //String message = context.getString(R.string.server_unregistered);
+		        //TODO create non-hardcoded string
 	            String message = "This device has been unregistered.";
 	            Utilities.displayMessage(context, message);
 	        } catch (IOException e) {
@@ -100,7 +109,9 @@ import android.app.Activity;
 	            // if the server tries to send a message to the device, it will get
 	            // a "NotRegistered" error message and should unregister the device.
 	            //String message = context.getString(R.string.server_unregister_error,e.getMessage());
-	            String message = "server_unregister_error";
+		        
+	        	//TODO create non-hardcoded string
+	        	String message = "server_unregister_error";
 	            Utilities.displayMessage(context, message);
 	        }
 	    }

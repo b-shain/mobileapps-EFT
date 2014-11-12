@@ -87,7 +87,8 @@ public class EFTBroadcastReceiver extends WakefulBroadcastReceiver {
 	    private void sendNotification(String msg, Context context) {
 	        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-	        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, DeviceRegistrationActivity.class), 0);
+	        //Main Activity is the activity we would like to open
+	        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
 
 	        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
 	        .setSmallIcon(R.drawable.ic_stat_gcm)
