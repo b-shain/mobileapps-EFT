@@ -4,5 +4,25 @@
     <string name="app_name">EncryptedFileTransfer</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_home">HomeActivity</string>
+<<<<<<< HEAD
+=======
+    <string name="btnRegister">Register!</string>
+    <string name="usernameHint">Enter Username</string>
+    <string name="passwordHint">Enter Password</string>
+    <string name="login">Login!</string>
+    <string name="logout">Logout!</string>
+    <string name="app_acronym">EFT</string>
+    <string name="title_activity_registration">Registration</string>
+    <string name="registration">Enter the following information to become a registered user of EFT:</string>
+    <string name="firstnameHint">Enter Your First Name</string>
+    <string name="lastnameHint">Enter Your Last Name</string>
+    <string name="emailHint">Enter Your Email</string>
+    <string name="register">Register!</string>
+    <string name="dismiss">Cancel</string>
+    <string name="home">Home</string>
+    <string name="addfriend">Add a Friend</string>
+    <string name="sendFile">Send a File</string>
+    <string name="viewLog">View Transfer Log</string>
+>>>>>>> pr/2
 
 </resources>

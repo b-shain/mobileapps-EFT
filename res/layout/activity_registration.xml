@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/background_light"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="520dp"
+        android:layout_margin="1dp"
+        android:background="@drawable/encryption_1"
+        android:orientation="vertical" >
+     >
+
+        <LinearLayout
+            android:layout_width="250dp"
+            android:layout_height="0dp"
+            android:layout_margin="70dp"
+            android:layout_weight="0.22"
+            android:background="#80000000"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_launcher" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/registration"
+                android:textColor="#FFFFFF" />
+
+            <EditText
+                android:id="@+id/edttxtFirstName"
+                android:layout_width="225dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:hint="@string/firstnameHint"
+                android:textColor="#F8F8F8"
+                android:textColorHint="#F8F8F8" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/edttxtLastName"
+                android:layout_width="225dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:hint="@string/lastnameHint"
+                android:textColor="#F8F8F8"
+                android:textColorHint="#F8F8F8" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/edttxtEmail"
+                android:layout_width="225dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:hint="@string/emailHint"
+                android:inputType="textEmailAddress"
+                android:textColor="#F8F8F8"
+                android:textColorHint="#F8F8F8" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/edttxtRegUserName"
+                android:layout_width="225dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:hint="@string/usernameHint"
+                android:textColor="#F8F8F8"
+                android:textColorHint="#F8F8F8" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/edttxtPassword"
+                android:layout_width="225dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:hint="@string/passwordHint"
+                android:inputType="textPassword"
+                android:textColor="#F8F8F8"
+                android:textColorHint="#F8F8F8" >
+            </EditText>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout02"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentBottom="true" >
+
+                <Button
+                    android:id="@+id/register"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/blue"
+                    android:textColor="@color/white"
+                    android:text="@string/register" />
+
+                <Button
+                    android:id="@+id/dismiss"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/blue"
+                    android:textColor="@color/white"
+                    android:layout_marginLeft="5dp"
+                    android:text="@string/dismiss" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
