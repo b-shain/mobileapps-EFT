@@ -1,12 +1,63 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/encryption"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <TextView
+
+    <Button
+        android:id="@+id/btnRegister"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="31dp"
+        android:layout_marginRight="24dp"
+        android:textColor="#F8F8F8"
+        android:background="@color/green"
+        android:text="@string/btnRegister" />
+
+    <EditText
+        android:id="@+id/edttxtPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_above="@+id/btnLogin"
+        android:layout_alignRight="@+id/edttxtUsername"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:ellipsize="start"
+        android:ems="10"
+        android:hint="@string/passwordHint"
+        android:inputType="textPassword"
+        android:textColor="#F8F8F8"
+        android:textColorHint="#F8F8F8" />
+
+    <EditText
+        android:id="@+id/edttxtUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/edttxtPassword"
+        android:layout_centerHorizontal="true"
+        android:ellipsize="start"
+        android:ems="10"
+        android:hint="@string/usernameHint"
+        android:textColor="#F8F8F8"
+        android:textColorHint="#F8F8F8" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnRegister"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="159dp"
+        android:background="@color/green"
+        android:text="@string/login"
+        android:textColor="#F8F8F8" />
 
 </RelativeLayout>
