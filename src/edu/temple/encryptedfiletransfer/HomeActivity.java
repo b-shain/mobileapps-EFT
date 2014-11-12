@@ -1,14 +1,6 @@
 package edu.temple.encryptedfiletransfer;
 
 import android.app.Activity;
-<<<<<<< HEAD
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-
-//this is where the user selects their friend to send a file or accepts file send requests 
-public class HomeActivity extends Activity {
-=======
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -26,16 +18,12 @@ public class HomeActivity extends Activity {
 	Button btnAddFriend;
 	Button btnViewLog;
 	Button btnSendFile;
->>>>>>> pr/2
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-<<<<<<< HEAD
-	}
-}
-=======
 		
 		txtUserMessage = (TextView) findViewById(R.id.txtVwWelcome);
 		txtInstructions = (TextView) findViewById(R.id.txtVwHomeInstructions);
@@ -108,4 +96,3 @@ public class HomeActivity extends Activity {
 	}
 		 
 		}
->>>>>>> pr/2

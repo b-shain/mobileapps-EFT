@@ -2,16 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-<<<<<<< HEAD
+    android:background="@drawable/numbers"
     tools:context="${relativePackage}.${activityClass}" >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hello_world" />
-=======
-    android:background="@drawable/numbers"
-    tools:context="${relativePackage}.${activityClass}" >
 
     <TextView
         android:id="@+id/txtVwWelcome"
@@ -70,6 +67,6 @@
              android:text="@string/viewLog"
              android:textColor="@color/black" />
      </LinearLayout>
->>>>>>> pr/2
+
 
 </RelativeLayout>

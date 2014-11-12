@@ -4,8 +4,6 @@
     <string name="app_name">EncryptedFileTransfer</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_home">HomeActivity</string>
-<<<<<<< HEAD
-=======
     <string name="btnRegister">Register!</string>
     <string name="usernameHint">Enter Username</string>
     <string name="passwordHint">Enter Password</string>
@@ -23,6 +21,5 @@
     <string name="addfriend">Add a Friend</string>
     <string name="sendFile">Send a File</string>
     <string name="viewLog">View Transfer Log</string>
->>>>>>> pr/2
 
 </resources>
