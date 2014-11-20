@@ -47,7 +47,10 @@ public class MainActivity extends Activity {
 						HomeActivity.class);
 				successfulLoginIntent.putExtra("username", txtUsername
 						.getText().toString());
+				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(successfulLoginIntent);
+				finish(); //so the user can't go back to the login
 			}
 		});
 
@@ -105,6 +108,8 @@ public class MainActivity extends Activity {
 
 						Intent registrationIntent = new Intent(MainActivity.this, HomeActivity.class);
 						registrationIntent.putExtra("username",txtNewUserUsername.getText().toString());
+						registrationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						registrationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(registrationIntent);
 
 					}
