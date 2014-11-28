@@ -10,6 +10,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+<<<<<<< HEAD
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
@@ -18,6 +19,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
+=======
+import android.os.Bundle;
+>>>>>>> pr/4
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +40,7 @@ public class MainActivity extends Activity {
 	Button btnRegister;
 	EditText txtUsername;
 	EditText txtPassword;
+<<<<<<< HEAD
 	
     AsyncTask<Void, Void, Void> mLoginTask;
 
@@ -47,6 +52,9 @@ public class MainActivity extends Activity {
 	    }				
 	};	
     
+=======
+
+>>>>>>> pr/4
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,6 +69,7 @@ public class MainActivity extends Activity {
 		btnLogin.setOnClickListener(new View.OnClickListener() {
 
 			@Override
+<<<<<<< HEAD
 			public void onClick(View v) {		
 				//brandon
 		        mLoginTask = new AsyncTask<Void, Void, Void>() {
@@ -81,13 +90,24 @@ public class MainActivity extends Activity {
 		        };
 				mLoginTask.execute(null, null, null);
 				
+=======
+			public void onClick(View v) {
+
+>>>>>>> pr/4
 				// Brett - transition user to home screen once user has been
 				// logged in successfully
 				Intent successfulLoginIntent = new Intent(MainActivity.this,
 						HomeActivity.class);
 				successfulLoginIntent.putExtra("username", txtUsername
 						.getText().toString());
+<<<<<<< HEAD
 				startActivity(successfulLoginIntent);
+=======
+				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(successfulLoginIntent);
+				finish(); //so the user can't go back to the login
+>>>>>>> pr/4
 			}
 		});
 
@@ -145,6 +165,11 @@ public class MainActivity extends Activity {
 
 						Intent registrationIntent = new Intent(MainActivity.this, HomeActivity.class);
 						registrationIntent.putExtra("username",txtNewUserUsername.getText().toString());
+<<<<<<< HEAD
+=======
+						registrationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						registrationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+>>>>>>> pr/4
 						startActivity(registrationIntent);
 
 					}
@@ -153,8 +178,11 @@ public class MainActivity extends Activity {
 			}
 		});
 
+<<<<<<< HEAD
 	
         
+=======
+>>>>>>> pr/4
 	}
 	
 	@Override
