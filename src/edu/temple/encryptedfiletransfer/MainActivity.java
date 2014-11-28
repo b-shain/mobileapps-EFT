@@ -1,10 +1,23 @@
 package edu.temple.encryptedfiletransfer;
+import static edu.temple.encryptedfiletransfer.ServerUtils.register;
+import static edu.temple.encryptedfiletransfer.ServerUtils.logIn;
+import static edu.temple.encryptedfiletransfer.Utilities.TAG;
+
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +36,17 @@ public class MainActivity extends Activity {
 	Button btnRegister;
 	EditText txtUsername;
 	EditText txtPassword;
+	
+    AsyncTask<Void, Void, Void> mLoginTask;
 
+    final Handler webHandle = new Handler(){
+		@Override
+		public void handleMessage(Message msg) {		 
+			String loginResponse = (String) msg.obj;
+			//Toast.makeText(getApplicationContext(), "The Login Response was : " + loginResponse + ". Which should be your UserID", Toast.LENGTH_LONG).show();	            
+	    }				
+	};	
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,8 +61,26 @@ public class MainActivity extends Activity {
 		btnLogin.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public void onClick(View v) {
-
+			public void onClick(View v) {		
+				//brandon
+		        mLoginTask = new AsyncTask<Void, Void, Void>() {
+		            @Override
+		            protected Void doInBackground(Void... params) {              
+		            	Message msg = webHandle.obtainMessage();
+		            	String message = logIn(getApplicationContext(), "usrname","pass");
+		            	Log.e(TAG, message);
+		            	msg.obj = message;                	
+						webHandle.sendMessage(msg);
+		                return null;
+		            }
+		            @Override
+		            protected void onPostExecute(Void result) {
+		            	//brandon - Because AsyncTasks can only be used once
+		                mLoginTask = null;
+		            }
+		        };
+				mLoginTask.execute(null, null, null);
+				
 				// Brett - transition user to home screen once user has been
 				// logged in successfully
 				Intent successfulLoginIntent = new Intent(MainActivity.this,
@@ -112,5 +153,26 @@ public class MainActivity extends Activity {
 			}
 		});
 
+	
+        
 	}
+	
+	@Override
+	 protected void onResume(){
+	     super.onResume();
+	     Intent intent = getIntent();
+	     if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+	         Parcelable[] rawMessages = intent.getParcelableArrayExtra(
+	                 NfcAdapter.EXTRA_NDEF_MESSAGES);
+	 
+	         NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
+	         Toast.makeText(this, new String(message.getRecords()[0].getPayload()), Toast.LENGTH_LONG).show();
+	         //mTextView.setText(new String(message.getRecords()[0].getPayload()));
+	 
+	     } //else
+	    	 //Toast.makeText(this, "Waiting for NDEF Message", Toast.LENGTH_LONG).show();
+	         //mTextView.setText("Waiting for NDEF Message");
+	 
+	 }
+	
 }

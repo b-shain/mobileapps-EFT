@@ -6,7 +6,7 @@ import android.content.Intent;
 public final class Utilities {
      
     //Server registration URL
-    static final String SERVER_URL = "http://cis-linux2.temple.edu/~tud30441/registration.php";
+    static final String SERVER_URL = "http://cis-linux2.temple.edu/~tud30441/";
  
     // Google project id
     static final String SENDER_ID = "22453893049";

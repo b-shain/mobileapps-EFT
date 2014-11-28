@@ -1,12 +1,18 @@
 package edu.temple.encryptedfiletransfer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 //package edu.temple.encryptedfiletransfr;
@@ -150,6 +156,8 @@ public class EFTIntentService extends IntentService {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
 
+    JSONObject jObj;
+    
     static final String TAG = "EFT INTENT";
 
     
@@ -169,7 +177,7 @@ public class EFTIntentService extends IntentService {
     	Log.i("EFTIntentService", messageType + " @ " + SystemClock.elapsedRealtime());
 
 
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
+        if (!extras.isEmpty()) {  // has effect of unparsing Bundle
             /*
              * Filter messages based on message type. Since it is likely that GCM
              * will be extended in the future with new message types, just ignore
@@ -186,20 +194,24 @@ public class EFTIntentService extends IntentService {
             // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                // This loop represents the service doing some work.
-            	Log.i("EFTIntentService", "doing some work at @ " + SystemClock.elapsedRealtime());
-                for (int i=0; i<5; i++) {
-                    Log.i(TAG, "Working... " + (i+1)
-                            + "/5 @ " + SystemClock.elapsedRealtime());
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                    }
-                }
-                Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
-                // Post notification of received message.
-                sendNotification("Received: " + extras.toString());
+                
+                //sendNotification("Received: " + extras.toString());
+            	
+             // Post notification of received message.
+                String msgName = "";
+                try {
+                	extras.getString("message");
+                	
+                	jObj = new JSONObject(extras.getString("message"));
+                	jObj.names();
+                	msgName = jObj.getString("msg_title");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                sendNotification("Received: " + msgName);
                 Log.i(TAG, "Received: " + extras.toString());
+
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -207,21 +219,47 @@ public class EFTIntentService extends IntentService {
     }
 
     // Put the message into a notification and post it.
-    // This is just one simple example of what you might choose to do with
-    // a GCM message.
     private void sendNotification(String msg) {
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, DeviceRegistrationActivity.class), 0);
+      //Main Activity is the activity we would like to open
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-        .setSmallIcon(R.drawable.ic_stat_gcm)
-        .setContentTitle("EFT Notification")
-        .setStyle(new NotificationCompat.BigTextStyle()
-        .bigText(msg))
-        .setContentText(msg);
-
-        mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+	        .setSmallIcon(R.drawable.ic_stat_gcm)
+	        .setContentTitle("EFT Notification")
+	        .setStyle(new NotificationCompat.BigTextStyle()
+	        .bigText(msg))
+	        .setContentText(msg)
+	        .setDefaults(Notification.DEFAULT_SOUND);
+	        mBuilder.setContentIntent(contentIntent);
+	        
+	        //In order to display more messages have different NOTIFICATION_IDS
+	        int ID =  (int) SystemClock.elapsedRealtime();
+	        //mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+	        mNotificationManager.notify(ID, mBuilder.build());
     }
+    
+ // Put the message into a notification and post it.
+ 		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+ 	    private void sendNotification(String msg, Context context) {
+ 	        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+ 	        //Main Activity is the activity we would like to open
+ 	        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
+
+ 	        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+ 	        .setSmallIcon(R.drawable.ic_stat_gcm)
+ 	        .setContentTitle("EFT Notification")
+ 	        .setStyle(new NotificationCompat.BigTextStyle()
+ 	        .bigText(msg))
+ 	        .setContentText(msg)
+ 	        .setDefaults(Notification.DEFAULT_SOUND);
+ 	        mBuilder.setContentIntent(contentIntent);
+ 	        
+ 	        //In order to display more messages have different NOTIFICATION_IDS
+ 	        int ID =  (int) SystemClock.elapsedRealtime();
+ 	        //mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+ 	        mNotificationManager.notify(ID, mBuilder.build());
+ 	    }
+    
 }

@@ -21,5 +21,6 @@
     <string name="addfriend">Add a Friend</string>
     <string name="sendFile">Send a File</string>
     <string name="viewLog">View Transfer Log</string>
+    <string name="title_activity_add_user">Add User</string>
 
 </resources>

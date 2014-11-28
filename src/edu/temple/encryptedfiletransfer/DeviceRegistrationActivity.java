@@ -41,7 +41,7 @@ public class DeviceRegistrationActivity extends Activity {
 
     // Asyntask
     AsyncTask<Void, Void, Void> mRegisterTask;
-
+    
     TextView mDisplay;
     GoogleCloudMessaging gcm;
     AtomicInteger msgId = new AtomicInteger();
@@ -129,6 +129,9 @@ public class DeviceRegistrationActivity extends Activity {
  
                 };
 
+               
+                
+                
                 mRegisterTask.execute(null, null, null);
             }
        
