@@ -421,14 +421,6 @@ public class SendFile extends Activity {
 			fileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(fileIntent);
 			return true;
-		case R.id.ViewLog:
-			Intent logIntent = new Intent(SendFile.this, ViewLog.class);
-			logIntent.putExtra("username", txtUserMessage.getText().toString()
-					.substring(8, endIndex));
-			logIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			logIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(logIntent);
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

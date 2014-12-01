@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-      android:background="@drawable/key"
+    android:background="@drawable/locks"
     tools:context="${relativePackage}.${activityClass}" >
     
     <TextView
@@ -17,6 +17,7 @@
         android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+<<<<<<< HEAD
     <TextView
         android:id="@+id/textView_nfc"
         android:layout_width="wrap_content"
@@ -39,5 +40,16 @@
 
         <requestFocus />
     </EditText>
+=======
+    <ListView
+        android:id="@+id/lstVwAddFriend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/txtVwAddFriendWelcome"
+        android:layout_marginTop="162dp" >
+
+    </ListView>
+>>>>>>> pr/5
 
 </RelativeLayout>

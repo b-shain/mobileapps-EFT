@@ -16,19 +16,13 @@
     
     <item
         android:id="@+id/SendFile"
-        android:icon="@drawable/sendfile"
+        android:icon="@drawable/email"
         android:title="@string/sendFile"
         android:showAsAction="ifRoom"/>
-    
-    <item
-		android:id="@+id/ViewLog"
-		android:icon="@drawable/log"
-		android:title="@string/viewLog"
-		android:showAsAction="ifRoom"/>
         
     <item
         android:id="@+id/Logout"
-        android:icon="@drawable/logout"
+        android:icon="@drawable/exit"
         android:title="@string/logout"
         android:showAsAction="ifRoom" />
 

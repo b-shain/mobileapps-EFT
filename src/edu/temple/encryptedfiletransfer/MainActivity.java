@@ -164,6 +164,19 @@ public class MainActivity extends Activity {
 
 				//Brandon -- I relocated your code brett to be executed within the Login Handler
 
+<<<<<<< HEAD
+=======
+				// Brett - transition user to home screen once user has been
+				// logged in successfully
+				Intent successfulLoginIntent = new Intent(MainActivity.this,
+						HomeActivity.class);
+				successfulLoginIntent.putExtra("username", txtUsername
+						.getText().toString());
+				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(successfulLoginIntent);
+			    finish(); //so the user can't go back to the login
+>>>>>>> pr/5
 			}
 		});
 
