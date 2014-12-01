@@ -55,14 +55,14 @@ public class SendFile extends Activity {
 
 	TextView txtUserMessage;
 	Cipher aesCipher;
-	Button fileSearch, friendSearch;
+	Button fileSearch, friendSearch, sendFile;
 	JSONObject jObj;
 	JSONArray jArray;
 	ArrayList<String> friendList, list, idList;
 	ExtendedArrayAdapter fileAdapter, friendAdapter;
 	ListView friendListview, listview;
 	
-	String selectedFile, selectedUser;
+	String selectedFile, selectedUser, selectedUserID;
 
     AsyncTask<Void, Void, Void> friendsListTask, idTask;
 
@@ -126,16 +126,16 @@ public class SendFile extends Activity {
 					Log.d(TAG, "IDs: " + jArray.toString());
 					Log.d(TAG, "Names 2: " + jObj.names().toString());
 				//jArray = jObj.getJSONArray("Friend");
-					Log.d(TAG, "ID: " + jArray.getString(1).toString());
-					Log.d(TAG, "Array 0: " + jArray.getString(0).toString());
-
+					//Log.d(TAG, "ID: " + jArray.getString(1).toString());
+					//Log.d(TAG, "Array 0: " + jArray.getString(0).toString());
 			    for (int i = 0; i < jArray.length(); ++i) {
 			    	String temp = jArray.getString(i).toString();
 			    	JSONObject id = new JSONObject(temp);
-			    	String thisID = id.getString("ID");
-			      idList.add(thisID);
+			    	selectedUserID = id.getString("ID");
+			    	Log.d(TAG, "ID: " + selectedUserID);
+			      idList.add(selectedUserID);
 			    }
-				idList.get(0).toString();
+			    selectedUserID.toString();
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -145,7 +145,6 @@ public class SendFile extends Activity {
 		}					
 	};	
 
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -168,18 +167,8 @@ public class SendFile extends Activity {
 				+ prevIntent.getStringExtra("username") + "!";
 
 		txtUserMessage.setText(welcomeMessage);
-		try {
-			aesCipher = Cipher.getInstance("AES");
-			encryptfile();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		fileSearch = (Button) findViewById(R.id.btn_select_file);
+		sendFile = (Button) findViewById(R.id.btn_sendFile);
 		friendSearch = (Button) findViewById(R.id.btn_select_friend);
 
 		//File storageDirectory       = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));
@@ -320,7 +309,7 @@ public class SendFile extends Activity {
 			          int position, long id) {
 			        final String friendItem = (String) parent.getItemAtPosition(position);
 			        txtFriend.setText("You have selected " + friendItem + " as the recipient.");
-			        selectedFile = friendItem;
+			        selectedUser = friendItem;
 			        System.out.println(friendItem + " was clicked");
 			        friendListview.setVisibility(View.GONE);
 //			        view.animate().setDuration(2000).alpha(0)
@@ -355,6 +344,30 @@ public class SendFile extends Activity {
 				
 			}
 		});
+	
+		sendFile.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				final TextView response = (TextView) findViewById(R.id.textView_response);
+
+				try {
+					aesCipher = Cipher.getInstance("AES");
+				} catch (NoSuchAlgorithmException | NoSuchPaddingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
+					encryptfile();
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			}
+		});
+	
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -433,12 +446,34 @@ public class SendFile extends Activity {
 	
 	public void encryptfile() throws NoSuchAlgorithmException
 	{
+		
+		idList = new ArrayList<String>();		
+		//brandon
+        idTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {              
+            	Message msg = idHandle.obtainMessage();
+            	String message = getID(getApplicationContext(), selectedUser);
+            	Log.e(TAG, message);
+            	msg.obj = message;                	
+				idHandle.sendMessage(msg);
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void result) {
+            	//brandon - Because AsyncTasks can only be used once
+                idTask = null;
+            }
+        };
+        
+        //AS long as there is a selected recipient
+        if(selectedUser != "" && selectedUser != null){
+		idTask.execute(null, null, null);
+		if(selectedUserID != "" && selectedUserID != null){
 		try
 	      { 		
-			File storageDirectory = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));
-			
-			storageDirectory.mkdir();
-			
+			File storageDirectory = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));			
+			storageDirectory.mkdir();		
 			File eftDirectory = new File(Environment.getExternalStorageDirectory().toString() + "/eft");
 			
 			if (!eftDirectory.exists()) {
@@ -462,17 +497,30 @@ public class SendFile extends Activity {
 	         
 	         //Unencrypted file has been stored
 	         String UUID = android.os.Build.SERIAL;
-		      System.out.println("UUID: " + UUID);
-
-	         //Retrieve other users serial
-	         String UUID_2 = android.os.Build.SERIAL + 1;
+		     System.out.println("String UUID: " + UUID);	
+	         System.out.println("Int UUID: " + Integer.parseInt(UUID));
 	         
-	         String combination = UUID + UUID_2;
-		      System.out.println("Combination: " + combination);
+	         //Retrieve other users serial
+	         String UUID_2 = selectedUserID;
+	         System.out.println("String UUID_2: " + UUID_2);
+	         System.out.println("Int UUID_2: " + Integer.parseInt(UUID_2));
+	         long combo = (Long.parseLong(UUID) * Long.parseLong(UUID_2));
+	         long x = Long.parseLong("1000000000000");
+	         while (combo < 0)
+	         {
+	        	 combo = (Long.parseLong(UUID) * Long.parseLong(UUID_2)) - x;
+	        	 x = x + Long.parseLong("1000000000000");
+	         }
+	         long combo2 = Integer.parseInt(UUID_2) * Integer.parseInt(UUID);
+	         //String combination = (UUID + UUID_2);
+		     System.out.println("Long Combination: " + combo);
+		     System.out.println("Combination 2: " + combo2);
+
 
 	         //combination.getBytes();
 	         //SecretKey key = new SecretKeySpec(combination.getBytes("UTF-8"), "AES");
-	         byte[] key = (UUID + UUID_2).getBytes("UTF-8");
+	         byte[] key = (Long.toString(combo)).getBytes("UTF-8");
+	         System.out.println("Combination to string: " + Long.toString(combo));
 	         String uuid = new String(key);
 		     System.out.println("UUID combination Array: " + uuid);
 	         MessageDigest sha = MessageDigest.getInstance("SHA-1");
@@ -494,7 +542,7 @@ public class SendFile extends Activity {
 	         
 	         //Select UUID from Associated User where Username = friendName
 	         
-	         getID(getApplicationContext(), selectedUser);
+	         //getID(getApplicationContext(), selectedUser);
 	         selectedUser.toString();
 	         
 	         encrypt(f, c, secretKeySpec);	    
@@ -551,7 +599,9 @@ public class SendFile extends Activity {
 	      }
 	      System.out.println("Deserialized file...");
 		
-		
+        }
+	      
+        }
 		
 	}
 	
