@@ -31,12 +31,9 @@ public class HomeActivity extends Activity {
 		txtUserMessage = (TextView) findViewById(R.id.txtVwWelcome);
 		txtInstructions = (TextView) findViewById(R.id.txtVwHomeInstructions);
 		btnAddFriend = (Button) findViewById(R.id.btnAddNewFriend);
-<<<<<<< HEAD
-		btnViewLog = (Button) findViewById(R.id.btnViewLog);
-		btnSendFile = (Button) findViewById(R.id.SendFile);
-=======
 		//btnViewLog = (Button) findViewById(R.id.btnViewLog);
->>>>>>> pr/5
+		btnSendFile = (Button) findViewById(R.id.SendFile);
+
 		btnSendFile = (Button) findViewById(R.id.btnSendFile);
 		
 		lstvwFiles = (ListView) findViewById(R.id.lstViewFiles);

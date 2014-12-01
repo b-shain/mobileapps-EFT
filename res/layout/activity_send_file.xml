@@ -4,14 +4,9 @@ android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 android:id="@+id/scrollview"
 android:fillViewport="true" >
-
 <RelativeLayout
     android:layout_width="match_parent"
-<<<<<<< HEAD
     android:layout_height="wrap_content"
-=======
-    android:layout_height="match_parent"
->>>>>>> pr/5
     android:background="@drawable/lock"
     tools:context="${relativePackage}.${activityClass}" >
 
@@ -27,7 +22,6 @@ android:fillViewport="true" >
         android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceMedium" />
    
-<<<<<<< HEAD
       <TextView
           android:id="@+id/textView_friendName"
           android:layout_width="wrap_content"
@@ -110,17 +104,7 @@ android:fillViewport="true" >
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/White" />
 
-=======
-       <ListView
-        android:id="@+id/lstVwSendFile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/txtVwSendFileWelcome"
-        android:layout_marginTop="162dp" >
-           
-    </ListView>
-           
->>>>>>> pr/5
+
+
 </RelativeLayout>
  </ScrollView>

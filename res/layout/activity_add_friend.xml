@@ -17,7 +17,6 @@
         android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-<<<<<<< HEAD
     <TextView
         android:id="@+id/textView_nfc"
         android:layout_width="wrap_content"
@@ -40,7 +39,7 @@
 
         <requestFocus />
     </EditText>
-=======
+
     <ListView
         android:id="@+id/lstVwAddFriend"
         android:layout_width="match_parent"
@@ -50,6 +49,6 @@
         android:layout_marginTop="162dp" >
 
     </ListView>
->>>>>>> pr/5
+ 
 
 </RelativeLayout>
