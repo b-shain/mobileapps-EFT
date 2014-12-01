@@ -72,63 +72,7 @@
          android:layout_marginTop="32dp" >
      </ListView>
 
-    <TextView
-        android:id="@+id/txtVwWelcome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="18dp"
-        android:layout_marginTop="22dp"
-        android:text="@string/app_name"
-        android:textColor="#F8F8F8"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/txtVwHomeInstructions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtVwWelcome"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="76dp"
-        android:textColor="#F8F8F8"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-     <LinearLayout
-         android:id="@+id/LinearLayout02"
-         android:background="#80000000"
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:layout_alignParentLeft="true"
-         android:layout_centerVertical="true" >
-
-         <Button
-             android:id="@+id/btnAddNewFriend"
-             android:layout_width="100dp"
-             android:layout_height="match_parent"
-             android:background="@color/LightCyan"
-             android:text="@string/addfriend"
-             android:textColor="@color/black" />
-
-         <Button
-             android:id="@+id/btnSendFile"
-             android:layout_width="0dp"
-             android:layout_height="match_parent"
-             android:layout_marginLeft="5dp"
-             android:layout_weight="0.33"
-             android:background="@color/LightCyan"
-             android:text="@string/sendFile"
-             android:textColor="@color/black" />
-
-         <Button
-             android:id="@+id/btnViewLog"
-             android:layout_width="100dp"
-             android:layout_height="match_parent"
-             android:layout_marginLeft="5dp"
-             android:background="@color/LightCyan"
-             android:text="@string/viewLog"
-             android:textColor="@color/black" />
-     </LinearLayout>
+    
 
 
 </RelativeLayout>

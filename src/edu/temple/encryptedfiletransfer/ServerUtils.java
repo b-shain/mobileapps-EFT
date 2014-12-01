@@ -1,12 +1,8 @@
 package edu.temple.encryptedfiletransfer;
 
-import android.app.Activity;
-	 
-	import static edu.temple.encryptedfiletransfer.Utilities.SERVER_URL;
+import static edu.temple.encryptedfiletransfer.Utilities.SERVER_URL;
 import static edu.temple.encryptedfiletransfer.Utilities.TAG;
 import static edu.temple.encryptedfiletransfer.Utilities.displayMessage;
-	 
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,10 +16,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-	 
 
-
-	import android.content.Context;
+import android.content.Context;
 import android.util.Log;
 	 
 	 
@@ -35,10 +29,12 @@ import android.util.Log;
 	    /**
 	     * Register this account/device pair within the server.
 	     */
-	    static void register(final Context context, String username, String password, String email, final String GCM_Reg_ID) {
+	    static void register(final Context context, String firstName, String lastName, String username, String password, String email, final String GCM_Reg_ID) {
 	        Log.i(TAG, "registering device (GCM_Reg_ID = " + GCM_Reg_ID + ")");
-	        String serverUrl = SERVER_URL + "registration.php";
+	        String serverUrl = SERVER_URL + "register.php";
 	        Map<String, String> params = new HashMap<String, String>();     
+	        params.put("FirstName", firstName);
+	        params.put("LastName", lastName);
 	        params.put("UserName", username);
 	        params.put("Password", password);
 	        params.put("EmailAddress", email);
@@ -53,7 +49,7 @@ import android.util.Log;
 	                //displayMessage(context, context.getString(R.string.server_registering, i, MAX_ATTEMPTS));
 	            	//TODO create non-hardcoded string
 	            	displayMessage(context, "server is registering");
-	            	post(serverUrl, params);
+	            	String response = post(serverUrl, params);
 	            	
 	            	//These lines are for registering the device with GCM, which is handled elsewhere now
 	                //GCMRegistrar.setRegisteredOnServer(context, true);
@@ -65,8 +61,6 @@ import android.util.Log;
 	                Utilities.displayMessage(context, message);
 	                return;
 	            } catch (IOException e) {
-	                // Here we are simplifying and retrying on any error
-	            	
 	                Log.e(TAG, "Failed to register on attempt " + i + ":" + e);
 	                if (i == MAX_ATTEMPTS) {
 	                    break;
@@ -80,7 +74,7 @@ import android.util.Log;
 	                    Thread.currentThread().interrupt();
 	                    return;
 	                }
-	                // increase backoff exponentially
+	                // increase back-off exponentially
 	                backoff *= 2;
 	            }
 	        }
@@ -123,7 +117,7 @@ import android.util.Log;
 	    }
 	 
 	    /**
-	     * Register this account/device pair within the server.
+	     * Login to the server.
 	     */
 	    static String logIn(final Context context, String username, String password) {
 	        String serverUrl = SERVER_URL + "login.php";
@@ -177,6 +171,89 @@ import android.util.Log;
 			return message;
 	    }
 	    
+	    /**
+	     * Register this account/device pair within the server.
+	     */
+	    static String checkIfUserExists(final Context context, String username) {
+	        String serverUrl = SERVER_URL + "isUserRegistered.php";
+	        Map<String, String> params = new HashMap<String, String>();     
+	        params.put("UserName", username);
+	         
+	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+	        // Since server might be down, we will retry it a few times.
+	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {
+	            Log.d(TAG, "Attempt #" + i + " to log in.");
+	            try {
+	                //displayMessage(context, context.getString(R.string.server_registering, i, MAX_ATTEMPTS));
+	            	//TODO create non-hardcoded string
+	            	
+	            	displayMessage(context, " device is checking to see if username exists already.");
+	            	String response = post(serverUrl, params);
+	                return response;
+	            } catch (IOException e) {	                
+	                try {
+	                    Log.d(TAG, "Sleeping for " + backoff + " ms before retry");
+	                    Thread.sleep(backoff);
+	                } catch (InterruptedException e1) {
+	                    // Activity finished before we complete - exit.
+	                    Log.d(TAG, "Thread interrupted: abort remaining retries!");
+	                    Thread.currentThread().interrupt();
+	                    return "This Was An Un-Successful Login Attempt.";
+	                }
+	                // increase backoff exponentially
+	                backoff *= 2;
+	            }
+	        }
+	        //String message = context.getString(R.string.server_register_error,MAX_ATTEMPTS);
+	        //TODO create non-hardcoded string
+	        String message = "server_register_error";
+	        Utilities.displayMessage(context, message);
+			return message;
+	    }
+	    
+	    	    
+	    /**
+	     * Get a user's friends list.
+	     */
+	    static String getFriends(final Context context, String username) {
+	        String serverUrl = SERVER_URL + "getFriendsList.php";
+	        Map<String, String> params = new HashMap<String, String>();     
+	        params.put("UserName", username);
+	         
+	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {
+	            Log.d(TAG, "Attempt #" + i + " to get friends list.");
+	            try {
+	            	//TODO create non-hardcoded string
+	            	displayMessage(context, " device is requesting users friend list.");
+	            	String response = post(serverUrl, params);
+	            	Log.d(TAG, "Response: " + response);
+		            String message = "These are the associated users: " + response;
+	                Utilities.displayMessage(context, message);
+	                return response;
+	            } catch (IOException e) {
+	                // Here we are simplifying and retrying on any error	            	
+	                Log.e(TAG, "Failed to get friends list on attempt " + i + ":" + e);
+	                if (i == MAX_ATTEMPTS) {
+	                    break;
+	                }
+	                try {
+	                    Log.d(TAG, "Sleeping for " + backoff + " ms before retry");
+	                    Thread.sleep(backoff);
+	                } catch (InterruptedException e1) {
+	                    Log.d(TAG, "Thread interrupted: abort remaining retries!");
+	                    Thread.currentThread().interrupt();
+	                    return "Was unable to get friends list.";
+	                }
+	                backoff *= 2;
+	            }
+	        }
+	        String message = "server_register_error";
+	        Utilities.displayMessage(context, message);
+			return message;
+	    }
+	    
+	    
 	    
 	    /**
 	     * Issue a POST request to the server.
@@ -221,8 +298,9 @@ import android.util.Log;
 			            // post the request
 			            OutputStream out = conn.getOutputStream();
 			            out.write(bytes);
-			            BufferedReader reader = new BufferedReader(new 
-			            InputStreamReader(conn.getInputStream()));
+			            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			            //InputStream is = conn.getErrorStream();
+			            //BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			            StringBuilder sb = new StringBuilder();
 			            String line = null;
 			            // Read Server Response

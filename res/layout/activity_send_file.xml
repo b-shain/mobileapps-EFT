@@ -1,11 +1,17 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:id="@+id/scrollview"
+android:fillViewport="true" >
+
+<RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-     android:background="@drawable/lock"
+    android:layout_height="wrap_content"
+    android:background="@drawable/lock"
     tools:context="${relativePackage}.${activityClass}" >
 
-   <TextView
+    <TextView
         android:id="@+id/txtVwSendFileWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,5 +22,68 @@
         android:text="@string/app_name"
         android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+   
+      <TextView
+          android:id="@+id/textView_friendName"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentLeft="true"
+          android:layout_below="@+id/listview"
+          android:layout_marginTop="27dp"
+          android:text="Please Select A User To Send A File To:"
+          android:textAppearance="?android:attr/textAppearanceLarge"
+          android:textColor="@color/White" />
+
+      <ListView
+          android:id="@+id/listview"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_alignParentLeft="true"
+          android:layout_below="@+id/textView_fileName"
+          android:layout_marginTop="21dp"
+          android:background="@color/white"
+          android:textColor="@color/Black" >
+      </ListView>
+
+      <TextView
+          android:id="@+id/textView_fileName"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentLeft="true"
+          android:layout_below="@+id/btn_select_file"
+          android:layout_marginTop="23dp"
+          android:text="Please Select A File to Send to A User: "
+          android:textAppearance="?android:attr/textAppearanceLarge"
+          android:textColor="@color/White" />
+
+      <Button
+          android:id="@+id/btn_select_file"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentLeft="true"
+          android:layout_below="@+id/txtVwSendFileWelcome"
+          android:layout_marginTop="21dp"
+          android:text="Select File" />
+
+            <ListView
+                android:id="@+id/friend_listview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/btn_select_friend"
+                android:layout_marginTop="16dp"
+                android:background="@color/white"
+                android:textColor="@color/Black" >
+            </ListView>
+
+            <Button
+                android:id="@+id/btn_select_friend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/textView_friendName"
+                android:layout_marginTop="18dp"
+                android:text="Select Friend" />
 
 </RelativeLayout>
+ </ScrollView>

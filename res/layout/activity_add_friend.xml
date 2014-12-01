@@ -17,4 +17,27 @@
         android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <TextView
+        android:id="@+id/textView_nfc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtVwAddFriendWelcome"
+        android:layout_below="@+id/txtVwAddFriendWelcome"
+        android:layout_marginTop="68dp"
+        android:text="DEFAULT TEXT IS HERE"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/editText_nfc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/textView_nfc"
+        android:layout_below="@+id/textView_nfc"
+        android:layout_marginTop="31dp"
+        android:ems="10"
+        android:text="DEFAULT" >
+
+        <requestFocus />
+    </EditText>
+
 </RelativeLayout>
