@@ -47,6 +47,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import static edu.temple.encryptedfiletransfer.ServerUtils.getFriends;
+import static edu.temple.encryptedfiletransfer.ServerUtils.getID;
 import static edu.temple.encryptedfiletransfer.Utilities.TAG;
 import static edu.temple.encryptedfiletransfer.Utilities.setListViewHeightBasedOnChildren;
 
@@ -57,10 +58,13 @@ public class SendFile extends Activity {
 	Button fileSearch, friendSearch;
 	JSONObject jObj;
 	JSONArray jArray;
-	ArrayList<String> friendList;
+	ArrayList<String> friendList, list, idList;
+	ExtendedArrayAdapter fileAdapter, friendAdapter;
 	ListView friendListview, listview;
+	
+	String selectedFile, selectedUser;
 
-    AsyncTask<Void, Void, Void> friendsListTask;
+    AsyncTask<Void, Void, Void> friendsListTask, idTask;
 
     final Handler friendsListHandle = new Handler(){
 		@Override
@@ -83,9 +87,17 @@ public class SendFile extends Activity {
 				Log.d(TAG, "Names 2: " + jObj.names().toString());
 				//jArray = jObj.getJSONArray("Friend");
 				Log.d(TAG, "Friend: " + jArray.getString(1).toString());
+				Log.d(TAG, "Array 0: " + jArray.getString(0).toString());
+
 			    for (int i = 0; i < jArray.length(); ++i) {
-			      friendList.add(jArray.getString(i).toString());
+			    	String temp = jArray.getString(i).toString();
+			    	JSONObject friend = new JSONObject(temp);
+			    	String thisFriend = friend.getString("Friend");
+			      friendList.add(thisFriend);
 			    }
+				friendList.get(0).toString();
+				friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
+			    friendListview.setAdapter(friendAdapter);
 				friendListview.setVisibility(View.VISIBLE);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -95,6 +107,45 @@ public class SendFile extends Activity {
 			}
 		}					
 	};	
+	
+    final Handler idHandle = new Handler(){
+		@Override
+		public void handleMessage(Message msg) {		 
+			String idResponse = (String) msg.obj;
+			if(idResponse == "")
+			{
+				//This should never trigger
+				Toast.makeText(getApplicationContext(), "No ID was found for that user.", Toast.LENGTH_LONG).show();	            
+			}
+			else
+			{
+			try {
+				jObj = new JSONObject(idResponse);
+					Log.d(TAG, "Names 1: " + jObj.names().toString());
+				jArray =  jObj.getJSONArray("IDs");
+					Log.d(TAG, "IDs: " + jArray.toString());
+					Log.d(TAG, "Names 2: " + jObj.names().toString());
+				//jArray = jObj.getJSONArray("Friend");
+					Log.d(TAG, "ID: " + jArray.getString(1).toString());
+					Log.d(TAG, "Array 0: " + jArray.getString(0).toString());
+
+			    for (int i = 0; i < jArray.length(); ++i) {
+			    	String temp = jArray.getString(i).toString();
+			    	JSONObject id = new JSONObject(temp);
+			    	String thisID = id.getString("ID");
+			      idList.add(thisID);
+			    }
+				idList.get(0).toString();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Toast.makeText(getApplicationContext(), "The ID Response was : " + idResponse + ".", Toast.LENGTH_LONG).show();	            
+			}
+		}					
+	};	
+
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -176,19 +227,21 @@ public class SendFile extends Activity {
 				listview.setVisibility(View.VISIBLE);
 				
 				
-				final ArrayList<String> list = new ArrayList<String>();
+				list = new ArrayList<String>();
 			    for (int i = 0; i < files.length; ++i) {
 			      list.add(files[i].toString());
 			    }
-			    final ExtendedArrayAdapter fileAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, list);
+				list.get(0).toString();
+			    fileAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, list);
 			    listview.setAdapter(fileAdapter);
-
+			    
 			    listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			      @Override
 			      public void onItemClick(AdapterView<?> parent, final View view,
 			          int position, long id) {
 			        final String item = (String) parent.getItemAtPosition(position);
+			        selectedFile = item;
 			        txt.setText("You have selected " + item + " to be sent.");
 			        System.out.println(item + " was clicked");
 			        listview.setVisibility(View.GONE);
@@ -257,7 +310,7 @@ public class SendFile extends Activity {
 				friendsListTask.execute(null, null, null);
 				friendListview.setVisibility(View.VISIBLE);
 
-			    final ExtendedArrayAdapter friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
+			    friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
 			    friendListview.setAdapter(friendAdapter);
 
 			    friendListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -265,9 +318,10 @@ public class SendFile extends Activity {
 			      @Override
 			      public void onItemClick(AdapterView<?> parent, final View view,
 			          int position, long id) {
-			        final String item = (String) parent.getItemAtPosition(position);
-			        txtFriend.setText("You have selected " + item + " as the recipient.");
-			        System.out.println(item + " was clicked");
+			        final String friendItem = (String) parent.getItemAtPosition(position);
+			        txtFriend.setText("You have selected " + friendItem + " as the recipient.");
+			        selectedFile = friendItem;
+			        System.out.println(friendItem + " was clicked");
 			        friendListview.setVisibility(View.GONE);
 //			        view.animate().setDuration(2000).alpha(0)
 //			            .withEndAction(new Runnable() {
@@ -438,7 +492,13 @@ public class SendFile extends Activity {
 	         final String decFileName = /*uri.getQueryParameter("filename")*/ "test_dec_copy" + ".txt";
 	         File d = new File (storageDirectory, decFileName);
 	         
-	         encrypt(f, c, secretKeySpec);	         
+	         //Select UUID from Associated User where Username = friendName
+	         
+	         getID(getApplicationContext(), selectedUser);
+	         selectedUser.toString();
+	         
+	         encrypt(f, c, secretKeySpec);	    
+	         
 	         decrypt(c, d, secretKeySpec);
 	         
 	      }catch(IOException i)
@@ -503,6 +563,7 @@ public class SendFile extends Activity {
 	   
 	    copy(is, os);
 	   
+	    is.close();
 	    os.close();
 	  }
 	 

@@ -248,10 +248,53 @@ import android.util.Log;
 	                backoff *= 2;
 	            }
 	        }
+	        String message = "server_error";
+	        Utilities.displayMessage(context, message);
+			return message;
+	    }
+	    
+	    
+	    
+	    /**
+	     * Get a user's ID.
+	     */
+	    static String getID(final Context context, String username) {
+	        String serverUrl = SERVER_URL + "getID.php";
+	        Map<String, String> params = new HashMap<String, String>();     
+	        params.put("UserName", username);
+	         
+	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {
+	            Log.d(TAG, "Attempt #" + i + " to get ID.");
+	            try {
+	            	displayMessage(context, " device is requesting user's id.");
+	            	String response = post(serverUrl, params);
+	            	Log.d(TAG, "Response: " + response);
+		            String message = "These are the associated user's Ids: " + response;
+	                Utilities.displayMessage(context, message);
+	                return response;
+	            } catch (IOException e) {
+	                // Here we are simplifying and retrying on any error	            	
+	                Log.e(TAG, "Failed to get IDs on attempt " + i + ":" + e);
+	                if (i == MAX_ATTEMPTS) {
+	                    break;
+	                }
+	                try {
+	                    Log.d(TAG, "Sleeping for " + backoff + " ms before retry");
+	                    Thread.sleep(backoff);
+	                } catch (InterruptedException e1) {
+	                    Log.d(TAG, "Thread interrupted: abort remaining retries!");
+	                    Thread.currentThread().interrupt();
+	                    return "Was unable to get user ID.";
+	                }
+	                backoff *= 2;
+	            }
+	        }
 	        String message = "server_register_error";
 	        Utilities.displayMessage(context, message);
 			return message;
 	    }
+	    
 	    
 	    
 	    
