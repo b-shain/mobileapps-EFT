@@ -37,8 +37,10 @@
 
          <Button
              android:id="@+id/btnAddNewFriend"
-             android:layout_width="100dp"
+             android:layout_width="300dp"
              android:layout_height="match_parent"
+             android:layout_marginLeft="15dp"
+             android:layout_marginStart="15dp"
              android:background="@color/LightCyan"
              android:text="@string/addfriend"
              android:textColor="@color/black" />
@@ -47,20 +49,13 @@
              android:id="@+id/btnSendFile"
              android:layout_width="0dp"
              android:layout_height="match_parent"
-             android:layout_marginLeft="5dp"
+             android:layout_marginStart="15dp"
+			 android:layout_marginEnd="15dp"
              android:layout_weight="0.33"
              android:background="@color/LightCyan"
              android:text="@string/sendFile"
              android:textColor="@color/black" />
 
-         <Button
-             android:id="@+id/btnViewLog"
-             android:layout_width="100dp"
-             android:layout_height="match_parent"
-             android:layout_marginLeft="5dp"
-             android:background="@color/LightCyan"
-             android:text="@string/viewLog"
-             android:textColor="@color/black" />
      </LinearLayout>
 
      <ListView

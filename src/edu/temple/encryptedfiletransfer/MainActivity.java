@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
 				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(successfulLoginIntent);
-				finish(); //so the user can't go back to the login
+			    finish(); //so the user can't go back to the login
 			}
 		});
 

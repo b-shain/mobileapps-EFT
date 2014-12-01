@@ -7,6 +7,7 @@
     <string name="btnRegister">Register!</string>
     <string name="usernameHint">Enter Username</string>
     <string name="passwordHint">Enter Password</string>
+    <string name="loginMsg">Login to EFT</string>
     <string name="login">Login!</string>
     <string name="logout">Logout!</string>
     <string name="app_acronym">EFT</string>

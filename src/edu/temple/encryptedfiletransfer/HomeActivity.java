@@ -30,7 +30,7 @@ public class HomeActivity extends Activity {
 		txtUserMessage = (TextView) findViewById(R.id.txtVwWelcome);
 		txtInstructions = (TextView) findViewById(R.id.txtVwHomeInstructions);
 		btnAddFriend = (Button) findViewById(R.id.btnAddNewFriend);
-		btnViewLog = (Button) findViewById(R.id.btnViewLog);
+		//btnViewLog = (Button) findViewById(R.id.btnViewLog);
 		btnSendFile = (Button) findViewById(R.id.btnSendFile);
 		lstvwFiles = (ListView) findViewById(R.id.lstViewFiles);
 
@@ -41,8 +41,7 @@ public class HomeActivity extends Activity {
 
 		txtUserMessage.setText(welcomeMessage);
 
-		String instructions = "You can now use EFT to add a friend/file recipient, send files, and/or "
-				+ "view a log of your previous transfers."
+		String instructions = "You can now use EFT to add a friend/file recipient, and/or send files "
 				+ " Click a button below or use the menu above to get started.";
 
 		txtInstructions.setText(instructions);
@@ -63,7 +62,7 @@ public class HomeActivity extends Activity {
 			}
 		});
 		
-		btnViewLog.setOnClickListener(new View.OnClickListener() {
+		/*btnViewLog.setOnClickListener(new View.OnClickListener() {
 			int nameIndex = txtUserMessage.getText().toString().indexOf("!");
 			
 			@Override
@@ -76,7 +75,7 @@ public class HomeActivity extends Activity {
 				startActivity(logIntent);
 				
 			}
-		});
+		});*/
 		
 		btnSendFile.setOnClickListener(new View.OnClickListener() {
 			int nameIndex = txtUserMessage.getText().toString().indexOf("!");
@@ -146,14 +145,6 @@ public class HomeActivity extends Activity {
 			fileIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			fileIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(fileIntent);
-			return true;
-		case R.id.ViewLog:
-			Intent logIntent = new Intent(HomeActivity.this, ViewLog.class);
-			logIntent.putExtra("username", txtUserMessage.getText().toString()
-					.substring(8, endIndex));
-			logIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			logIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(logIntent);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

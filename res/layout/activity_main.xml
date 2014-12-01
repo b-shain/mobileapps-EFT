@@ -18,7 +18,7 @@
         android:textColor="#F8F8F8"
         android:background="@color/green"
         android:text="@string/btnRegister" />
-
+    
     <EditText
         android:id="@+id/edttxtPassword"
         android:layout_width="wrap_content"
@@ -26,10 +26,11 @@
         android:layout_above="@+id/btnLogin"
         android:layout_alignRight="@+id/edttxtUsername"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="35dp"
         android:ellipsize="start"
         android:ems="10"
         android:hint="@string/passwordHint"
+        android:background="#80000000"
         android:inputType="textPassword"
         android:textColor="#F8F8F8"
         android:textColorHint="#F8F8F8" />
@@ -41,8 +42,10 @@
         android:layout_above="@+id/edttxtPassword"
         android:layout_centerHorizontal="true"
         android:ellipsize="start"
+        android:layout_marginBottom="25dp"
         android:ems="10"
         android:hint="@string/usernameHint"
+        android:background="#80000000"
         android:textColor="#F8F8F8"
         android:textColorHint="#F8F8F8" >
 
@@ -59,5 +62,17 @@
         android:background="@color/green"
         android:text="@string/login"
         android:textColor="#F8F8F8" />
+
+    <TextView
+        android:id="@+id/txtVwMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/edttxtUsername"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="180dp"
+        android:background="@color/green"
+        android:text="@string/loginMsg"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white" />
 
 </RelativeLayout>
