@@ -2,6 +2,7 @@ package edu.temple.encryptedfiletransfer;
 
 import static edu.temple.encryptedfiletransfer.ServerUtils.getFriends;
 import static edu.temple.encryptedfiletransfer.ServerUtils.getID;
+import static edu.temple.encryptedfiletransfer.ServerUtils.sendDownloadNotification;
 import static edu.temple.encryptedfiletransfer.Utilities.TAG;
 
 import java.io.BufferedReader;
@@ -56,8 +57,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SendFile extends Activity {
+	
+	int serverResponseCode = 0;
+	final String upLoadServerUri = "http://cis-linux2.temple.edu/~tud30441/upload.php";
+    HttpURLConnection conn = null;
+     DataOutputStream dos = null; 
+    final String lineEnd = "\r\n";
+    final String twoHyphens = "--";
+    final String boundary = "*****";
+    int bytesRead;
+	int bytesAvailable;
+	int bufferSize;
+    byte[] buffer;
+    final int maxBufferSize = 1 * 1024 * 1024;
 
-	TextView txtUserMessage;
+	TextView txtUserMessage, response;
 	Cipher aesCipher;
 	Button fileSearch, friendSearch, sendFile;
 	JSONObject jObj;
@@ -66,9 +80,9 @@ public class SendFile extends Activity {
 	ExtendedArrayAdapter fileAdapter, friendAdapter;
 	ListView friendListview, listview;
 	
-	String selectedFile, selectedUser, selectedUserID;
+	String userName, userID, selectedFile, selectedUser, selectedUserID, fileUrl;
 
-    AsyncTask<Void, Void, Void> friendsListTask, idTask;
+    AsyncTask<Void, Void, Void> friendsListTask, idTask, notificationTask, uploadTask;
 
     final Handler friendsListHandle = new Handler(){
 		@Override
@@ -87,19 +101,20 @@ public class SendFile extends Activity {
 				Log.d(TAG, "Names 1: " + jObj.names().toString());
 				jArray =  jObj.getJSONArray("Friends");
 				Log.d(TAG, "Friends: " + jArray.toString());
-				jObj.names();
+				//jObj.names();
 				Log.d(TAG, "Names 2: " + jObj.names().toString());
 				//jArray = jObj.getJSONArray("Friend");
-				Log.d(TAG, "Friend: " + jArray.getString(1).toString());
-				Log.d(TAG, "Array 0: " + jArray.getString(0).toString());
+				//Log.d(TAG, "Friend: " + jArray.getString(1).toString());
+				//Log.d(TAG, "Array 0: " + jArray.getString(0).toString());
 
 			    for (int i = 0; i < jArray.length(); ++i) {
 			    	String temp = jArray.getString(i).toString();
 			    	JSONObject friend = new JSONObject(temp);
 			    	String thisFriend = friend.getString("Friend");
+			    	Log.d(TAG, "Friend " + i + ": " + thisFriend);
 			      friendList.add(thisFriend);
 			    }
-				friendList.get(0).toString();
+				//friendList.get(0).toString();
 				friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
 			    friendListview.setAdapter(friendAdapter);
 				friendListview.setVisibility(View.VISIBLE);
@@ -149,6 +164,21 @@ public class SendFile extends Activity {
 		}					
 	};	
 
+    final Handler notificationHandle = new Handler(){
+		@Override
+		public void handleMessage(Message msg) {		 
+			String notificationResponse = (String) msg.obj;			
+			Toast.makeText(getApplicationContext(), "The Notification Response was : " + notificationResponse + ".", Toast.LENGTH_LONG).show();	            			
+		}					
+	};	
+
+    final Handler uploadHandle = new Handler(){
+		@Override
+		public void handleMessage(Message msg) {		 
+			String uploadResponse = (String) msg.obj;			
+			Toast.makeText(getApplicationContext(), "The Upload Response was : " + uploadResponse + ".", Toast.LENGTH_LONG).show();	            			
+		}					
+	};	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -159,22 +189,22 @@ public class SendFile extends Activity {
 		listview = (ListView) findViewById(R.id.listview);
 		friendListview = (ListView) findViewById(R.id.friend_listview);
 		txtUserMessage = (TextView) findViewById(R.id.txtVwSendFileWelcome);
+		fileSearch = (Button) findViewById(R.id.btn_select_file);
 		sendFile = (Button) findViewById(R.id.btn_sendFile);
-
+		friendSearch = (Button) findViewById(R.id.btn_select_friend);
+		response = (TextView) findViewById(R.id.textView_response);
 		
 		//hide the listviews
 		friendListview.setVisibility(View.GONE);
 		listview.setVisibility(View.GONE);
 		
 		Intent prevIntent = getIntent();
-		final String userName = prevIntent.getStringExtra("username");
+		userName = prevIntent.getStringExtra("username");
+		userID = android.os.Build.SERIAL;
 		String welcomeMessage = "Welcome "
 				+ prevIntent.getStringExtra("username") + "!";
 
 		txtUserMessage.setText(welcomeMessage);
-		fileSearch = (Button) findViewById(R.id.btn_select_file);
-		sendFile = (Button) findViewById(R.id.btn_sendFile);
-		friendSearch = (Button) findViewById(R.id.btn_select_friend);
 
 		//File storageDirectory       = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));
 		final File storageDirectory = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));
@@ -193,6 +223,27 @@ public class SendFile extends Activity {
 			@Override
 			public void onClick(View v) {
 				//File[] testFiles = storageDirectory.listFiles();
+				
+	         
+		         try {
+		        	 //This is to create a test file to be encrypted in case there are none in the application directory
+						final String fileName = /*uri.getQueryParameter("filename")*/ "test" + ".txt";
+				         File f;
+				         //FileOutputStream fileOut = new FileOutputStream( f = new File (eftDirectory, fileName));
+				         FileOutputStream fileOut = new FileOutputStream( f = new File (storageDirectory, fileName));
+				         System.out.println(f.getAbsolutePath());
+				         //ObjectOutputStream out = new ObjectOutputStream(fileOut);
+				         String tst = ("This is a test file. If you can read this then the file is not encrypted.");
+				         fileOut.write(tst.getBytes());
+				         fileOut.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		         //out.writeObject(tst);
+		         //out.close();
+		         
+				
 				
 				File[] files = storageDirectory.listFiles(new FileFilter() {
 					@Override
@@ -302,11 +353,12 @@ public class SendFile extends Activity {
 		        };
 		        
 				friendsListTask.execute(null, null, null);
-				friendListview.setVisibility(View.VISIBLE);
+				
 
 			    friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
 			    friendListview.setAdapter(friendAdapter);
-
+			    friendListview.setVisibility(View.VISIBLE);
+			    
 			    friendListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			      @Override
@@ -317,36 +369,10 @@ public class SendFile extends Activity {
 			        selectedUser = friendItem;
 			        System.out.println(friendItem + " was clicked");
 			        friendListview.setVisibility(View.GONE);
-//			        view.animate().setDuration(2000).alpha(0)
-//			            .withEndAction(new Runnable() {
-//			              @Override
-//			              public void run() {
-//			                list.remove(item);
-//			                adapter.notifyDataSetChanged();
-//			                view.setAlpha(1);
-//			              }
-//			            });
 			      }
 
 			    });
-			    
-				
-//				if(files != null){
-//					ArrayAdapter<Object> fileListAdapter = new ArrayAdapter<Object>(getApplicationContext(), R.layout.activity_send_file, R.id.textView_fileName, files);
-//					ListView lv = (ListView) findViewById(R.id.listview);
-//						if(lv != null)
-//						{
-//							lv.setAdapter(fileListAdapter);
-//						}
-//				}
-//				else{
-//					TextView txt = (TextView) findViewById(R.id.textView_fileName);
-//					//R.id.fileName.text == "";
-//					txt.setText("The directory is empty.");
-//					//android.R.layout.simple_list_item_1;
-//				}
-				
-				
+			
 			}
 		});
 
@@ -355,33 +381,22 @@ public class SendFile extends Activity {
 			@Override
 			public void onClick(View v) {
 
-				final TextView response = (TextView) findViewById(R.id.textView_response);
+				//response = (TextView) findViewById(R.id.textView_response);
 
 				try {
+					if(selectedUser != "" && selectedUser != null && selectedFile != null && selectedFile != ""){
+					response.setText("");
 					aesCipher = Cipher.getInstance("AES");
+					encryptfile();
+					}
+					else
+					{
+						response.setText("Please be sure to select a recipient and file to be sent.");
+					}
 				} catch (NoSuchAlgorithmException | NoSuchPaddingException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				try {
-					encryptfile();
-				} catch (NoSuchAlgorithmException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
-//			}
-//		});
-	
-
-				File inFile = new File(selectedFile);
-				File outFile = null;
-				String[] filePath = selectedFile.split("/");
-				String fileName = filePath[filePath.length - 1];
-				
-				//encrypt(inFile,outFile,);
-				
-				//uploadFile(inFile.getAbsolutePath(),,fileName);
 			}
 		});
 	}
@@ -475,18 +490,13 @@ public class SendFile extends Activity {
         };
         
         //AS long as there is a selected recipient
-        if(selectedUser != "" && selectedUser != null){
+        if(selectedUser != "" && selectedUser != null && selectedFile != null && selectedFile != ""){
 		idTask.execute(null, null, null);
 		if(selectedUserID != "" && selectedUserID != null){
 		try
 	      { 		
 			File storageDirectory = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));			
 			storageDirectory.mkdir();		
-			File eftDirectory = new File(Environment.getExternalStorageDirectory().toString() + "/eft");
-			
-			if (!eftDirectory.exists()) {
-				eftDirectory.mkdir();
-	        }
 			
 			 //File f = new File(eftDirectory + "/test.txt");  
 	           
@@ -504,27 +514,34 @@ public class SendFile extends Activity {
 	         System.out.println("Serialized data is saved in: " + storageDirectory.toString());
 	         
 	         //Unencrypted file has been stored
-	         String UUID = android.os.Build.SERIAL;
+	         String UUID = android.os.Build.SERIAL;  	         
+   	         String str1 = "0x" + UUID;
 		     System.out.println("String UUID: " + UUID);	
-	         System.out.println("Int UUID: " + Integer.parseInt(UUID));
+	         System.out.println("Int UUID: " + Long.decode(str1));
 	         
 	         //Retrieve other users serial
 	         String UUID_2 = selectedUserID;
+	         String str2 = "0x" + UUID_2;
 	         System.out.println("String UUID_2: " + UUID_2);
-	         System.out.println("Int UUID_2: " + Integer.parseInt(UUID_2));
+	         System.out.println("Int UUID_2: " + Long.decode(str2));
 	         
-	         //Algorithm
-	         long combo = (Long.parseLong(UUID) * Long.parseLong(UUID_2));
-	         long x = Long.parseLong("1000000000000");
-	         while (combo < 0)
-	         {
-	        	 combo = (Long.parseLong(UUID) * Long.parseLong(UUID_2)) - x;
-	        	 x = x + Long.parseLong("1000000000000");
-	         }
-	         long combo2 = Integer.parseInt(UUID_2) * Integer.parseInt(UUID);
-	         //String combination = (UUID + UUID_2);
-		     System.out.println("Long Combination: " + combo);
-		     System.out.println("Combination 2: " + combo2);
+
+   	         
+             //Long.decode(str1);
+   	         
+   	         //Algorithm
+   	         //long combo = (Long.parseLong(android.os.Build.SERIAL, 16) * Long.parseLong(UUID_2, 16));
+   	         long combo = (Long.decode(str1) *  Long.decode(str2));
+   	         long x = Long.parseLong("1000000000000");
+   	         while (combo < 0)
+   	         {
+   	        	 combo = (Long.decode(str1) *  Long.decode(str2)) - x;
+   	        	 x = x + Long.parseLong("1000000000000");
+   	         }
+   	         long combo2 = (Long.decode(str1) *  Long.decode(str2));
+   	         //String combination = (UUID + UUID_2);
+   		     System.out.println("Long Combination: " + combo);
+   		     System.out.println("Combination 2: " + combo2);
 
 
 	         //combination.getBytes();
@@ -544,26 +561,67 @@ public class SendFile extends Activity {
 	         	         
 	         SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 	         
-	         final String encFileName = /*uri.getQueryParameter("filename")*/ "test_copy" + ".txt";
-	         File c = new File (storageDirectory, encFileName);
+	         final String decFileName = fileName;
+ 	         File decrypFile = new File (storageDirectory, decFileName);
 	         
-	         final String decFileName = /*uri.getQueryParameter("filename")*/ "test_dec_copy" + ".txt";
-	         File d = new File (storageDirectory, decFileName);
+	         final String encFileName = "(Encrypted)" + fileName;
+ 	         File encFile = new File (storageDirectory, encFileName);
+	         
+	         //final String encFileName = /*uri.getQueryParameter("filename")*/ "test_copy" + ".txt";
+	         //File c = new File (storageDirectory, encFileName);
+	         
+	         //final String decFileName = /*uri.getQueryParameter("filename")*/ "test_dec_copy" + ".txt";
+	         //File d = new File (storageDirectory, decFileName);
 	         
 	         //Select UUID from Associated User where Username = friendName
 	         
 	         //getID(getApplicationContext(), selectedUser);
 	         selectedUser.toString();
 	         
-	         encrypt(f, c, secretKeySpec);	 
+	         encrypt(f, encFile, secretKeySpec);	 
 	         
 	         //sendfile
+	         encFile.getPath().toString();
 	         
+	         //int temp = selectedFile.split("/").length;
+	         int temp = encFile.getPath().toString().split("/").length;
+         	 String tempFileName = encFile.getPath().toString().split("/")[(temp - 1)];
+         	 String tempFilePath = "";
+         	 for(int i = 0; i < (temp - 1); i++)
+         	 {
+         		tempFilePath = tempFilePath + "/" + encFile.getPath().toString().split("/")[(i)];
+         		 
+         	 }
 	         	//upload file
-	         	//store filepath
-	         	//send GCM notification
+	           uploadFile(encFile.getPath().toString(), tempFilePath, tempFileName);
 	         
-	         decrypt(c, d, secretKeySpec);
+	         	//store filepath
+	            fileUrl = "http://cis-linux2.temple.edu/~tud30441/uploads/" + tempFileName;
+	            //selectedFile = "http://cis-linux2.temple.edu/~tud30441/uploads/testFile.txt";
+	         	//send GCM notification
+				//brandon
+	            
+		        notificationTask = new AsyncTask<Void, Void, Void>() {
+		            @Override
+		            protected Void doInBackground(Void... params) {              
+		            	Message msg = notificationHandle.obtainMessage();
+		            	String message = sendDownloadNotification(getApplicationContext(), userName, selectedUser, fileUrl);
+		            	//String message = logIn(getApplicationContext(), txtUsername.getText().toString(), txtPassword.getText().toString());
+		            	Log.e(TAG, message);
+		            	msg.obj = message;                	
+						notificationHandle.sendMessage(msg);
+		                return null;
+		            }
+		            @Override
+		            protected void onPostExecute(Void result) {
+		            	//brandon - Because AsyncTasks can only be used once
+		            	notificationTask = null;
+		            }
+		        };
+		        
+		        notificationTask.execute(null, null, null);
+	         
+	         //decrypt(c, d, secretKeySpec);
 	         
 	      }catch(IOException i)
 	      {
@@ -576,44 +634,7 @@ public class SendFile extends Activity {
 			e.printStackTrace();
 		}
 		
-		try
-	      {
-			File storageDirectory = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));			
-			//storageDirectory.mkdir();
-			File eftDirectory = new File(Environment.getExternalStorageDirectory().toString() + "/eft");			
-			if (!eftDirectory.exists()) {
-				eftDirectory.mkdir();
-	        }
-			
-			 //File f = new File(eftDirectory + "/test.txt");  
-			 final String decFileName = /*uri.getQueryParameter("filename")*/ "test_dec_copy" + ".txt";
-	         File d = new File (storageDirectory, decFileName);
-	         final String fileName = /*uri.getQueryParameter("filename")*/ "test_copy" + ".txt";
-	         File f;
-	         FileInputStream fileIn = new FileInputStream(f = new File (storageDirectory, fileName));
-	         BufferedReader reader = new BufferedReader(new InputStreamReader(fileIn));
-	         String line = reader.readLine();
-		     System.out.println("Deserialized encrypted file: " + line);
-	         fileIn.close();
-	         
-	         fileIn = new FileInputStream(d);
-	         reader = new BufferedReader(new InputStreamReader(fileIn));
-	         line = reader.readLine();
-		     System.out.println("Deserialized decrypted file: " + line);
-	         fileIn.close();
-	         
-	         //ObjectInputStream in = new ObjectInputStream(fileIn);
-	         String result = fileIn.toString();
-		      System.out.println(result);
-	         //e = (Employee) in.readObject();
-	         //in.close();
-
-	      }catch(IOException i)
-	      {
-	         i.printStackTrace();
-	         return;
-	      }
-	      System.out.println("Deserialized file...");
+		File storageDirectory = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));			
 		
         }
 	      
@@ -653,19 +674,10 @@ public class SendFile extends Activity {
 	    }
 	  }
 	  
-	  public int uploadFile(String sourceFileUri, final String uploadFilePath, final String uploadFileName) {
+	  public int uploadFile(final String sourceFileUri, final String uploadFilePath, final String uploadFileName) {
 	        
-			int serverResponseCode = 0;
-			String upLoadServerUri = "cis-linux2.temple/Fal2014/4340/EncFileTransfer/public_html/upload.php";
-	        HttpURLConnection conn = null;
-	        DataOutputStream dos = null; 
-	        String lineEnd = "\r\n";
-	        String twoHyphens = "--";
-	        String boundary = "*****";
-	        int bytesRead, bytesAvailable, bufferSize;
-	        byte[] buffer;
-	        int maxBufferSize = 1 * 1024 * 1024;
-	        File sourceFile = new File(sourceFileUri);
+
+	        final File sourceFile = new File(sourceFileUri);
 	         
 	        if (!sourceFile.isFile()) {
 	             
@@ -686,8 +698,25 @@ public class SendFile extends Activity {
 	        }
 	        else
 	        {
-	             try {
-	                  
+	 				//brandon
+	 		        uploadTask = new AsyncTask<Void, Void, Void>() {
+	 		            @Override
+	 		            protected Void doInBackground(Void... params) {              
+	 		            	Message msg = uploadHandle.obtainMessage();
+	 		            	               	
+//	 						uploadHandle.sendMessage(msg);
+//	 		                return null;
+//	 		            }
+//	 		            @Override
+//	 		            protected void onPostExecute(Void result) {
+//	 		            	//brandon - Because AsyncTasks can only be used once
+//	 		                uploadTask = null;
+//	 		            }
+//	 		        };
+	 		        
+//	 				uploadTask.execute(null, null, null);
+	 		            	 try {
+	 			                  
 	                   // open a URL connection to the Servlet
 	                 FileInputStream fileInputStream = new FileInputStream(sourceFile);
 	                 URL url = new URL(upLoadServerUri);
@@ -739,27 +768,28 @@ public class SendFile extends Activity {
 	                 Log.i("uploadFile", "HTTP Response is : "
 	                         + serverResponseMessage + ": " + serverResponseCode);
 	                  
-	                 if(serverResponseCode == 200){
-	                      
-	                     runOnUiThread(new Runnable() {
-	                          public void run() {
-	                               
-	                              String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
-	                                            +" http://www.androidexample.com/media/uploads/"
-	                                            +uploadFileName;
-	                               
-	                              //messageText.setText(msg);
-	                              Toast.makeText(SendFile.this, "File Upload Complete.",
-	                                           Toast.LENGTH_SHORT).show();
-	                          }
-	                      });               
-	                 }   
+//	                 if(serverResponseCode == 200){
+//	                      
+//	                     runOnUiThread(new Runnable() {
+//	                          public void run() {
+//	                               
+//	                              String msg = "File Upload Completed.\n\n"
+//	                                            +" http://cis-linux2.temple.edu/~tud30441//uploads/"
+//	                                            +uploadFileName;
+//	                               
+//	                              //messageText.setText(msg);
+//	                              Toast.makeText(SendFile.this, "File Upload Complete.",
+//	                                           Toast.LENGTH_SHORT).show();
+//	                          }
+//	                      });               
+//	                 }   
 	                  
 	                 //close the streams //
 	                 fileInputStream.close();
 	                 dos.flush();
 	                 dos.close();
-	                   
+	                 
+
 	            } catch (MalformedURLException ex) {
 	                 
 	                //dialog.dismiss(); 
@@ -789,12 +819,37 @@ public class SendFile extends Activity {
 	                Log.e("Upload file to server Exception", "Exception : "
 	                                                 + e.getMessage(), e); 
 	            }
+	 		            	 
+	 						uploadHandle.sendMessage(msg);
+	 		                return null;
+	 		            }
+	 		            @Override
+	 		            protected void onPostExecute(Void result) {
+	 		            	//brandon - Because AsyncTasks can only be used once
+	 		                uploadTask = null;
+	 		            }
+	 		        };
+	 		        
+	 				uploadTask.execute(null, null, null);
 	            //dialog.dismiss();      
 	            return serverResponseCode;
 	             
+	            
+	            
+	            
 	         } // End else block
 	       }
 	
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
 	  public class ExtendedArrayAdapter extends ArrayAdapter<String> {
 
 		    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();

@@ -79,19 +79,19 @@ public class AddFriend extends Activity implements CreateNdefMessageCallback, On
 				Log.d(TAG, "Names 1: " + jObj.names().toString());
 				jArray =  jObj.getJSONArray("Friends");
 				Log.d(TAG, "Friends: " + jArray.toString());
-				jObj.names();
+				//jObj.names();
 				Log.d(TAG, "Names 2: " + jObj.names().toString());
 				//jArray = jObj.getJSONArray("Friend");
-				//Log.d(TAG, "Friend: " + jArray.getString(1).toString());
 				//Log.d(TAG, "Array 0: " + jArray.getString(0).toString());
 
 			    for (int i = 0; i < jArray.length(); ++i) {
 			    	String temp = jArray.getString(i).toString();
 			    	JSONObject friend = new JSONObject(temp);
 			    	String thisFriend = friend.getString("Friend");
+			    	Log.d(TAG, "Friend " + i + ": " + thisFriend);
 			      friendList.add(thisFriend);
 			    }
-				friendList.get(0).toString();
+				//friendList.get(0).toString();
 				friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
 			    friendListview.setAdapter(friendAdapter);
 				friendListview.setVisibility(View.VISIBLE);

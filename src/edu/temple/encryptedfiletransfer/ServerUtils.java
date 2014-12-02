@@ -172,7 +172,7 @@ import android.util.Log;
 	    }
 	    
 	    /**
-	     * Register this account/device pair within the server.
+	     * Check if a user exists in the database
 	     */
 	    static String checkIfUserExists(final Context context, String username) {
 	        String serverUrl = SERVER_URL + "isUserRegistered.php";
@@ -337,6 +337,46 @@ import android.util.Log;
 			return message;
 	    }
 	    
+	    
+	    static String sendDownloadNotification(final Context context, String userName1, String userName2, String fileUrl) {
+	        String serverUrl = SERVER_URL + "sendDownloadNotification.php";
+	        Map<String, String> params = new HashMap<String, String>();     
+	        params.put("UserName_1", userName1);
+	        params.put("UserName_2", userName2);
+	        params.put("File_URL", fileUrl);
+	         
+	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {
+	            Log.d(TAG, "Attempt #" + i + " to send notification");
+	            try {
+	            	displayMessage(context, " server is sending notification");
+	            	String response = post(serverUrl, params);
+	            	
+		            String message = "These notification has been sent.";
+	                Utilities.displayMessage(context, message);
+	                return response;
+	            } catch (IOException e) {
+	                Log.e(TAG, "Failed to send notification on attempt " + i + ":" + e);
+	                if (i == MAX_ATTEMPTS) {
+	                    break;
+	                }
+	                try {
+	                    Log.d(TAG, "Sleeping for " + backoff + " ms before retry");
+	                    Thread.sleep(backoff);
+	                } catch (InterruptedException e1) {
+	                    // Activity finished before we complete - exit.
+	                    Log.d(TAG, "Thread interrupted: abort remaining retries!");
+	                    Thread.currentThread().interrupt();
+	                    return "error";
+	                }
+	                // increase back-off exponentially
+	                backoff *= 2;
+	            }
+	        }
+	        String message = "server_error";
+	        Utilities.displayMessage(context, message);
+			return message;
+	    }
 	    
 	    
 	    
