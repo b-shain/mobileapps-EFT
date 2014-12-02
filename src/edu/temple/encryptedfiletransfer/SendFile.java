@@ -1,5 +1,9 @@
 package edu.temple.encryptedfiletransfer;
 
+import static edu.temple.encryptedfiletransfer.ServerUtils.getFriends;
+import static edu.temple.encryptedfiletransfer.ServerUtils.getID;
+import static edu.temple.encryptedfiletransfer.Utilities.TAG;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -50,10 +54,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import static edu.temple.encryptedfiletransfer.ServerUtils.getFriends;
-import static edu.temple.encryptedfiletransfer.ServerUtils.getID;
-import static edu.temple.encryptedfiletransfer.Utilities.TAG;
-import static edu.temple.encryptedfiletransfer.Utilities.setListViewHeightBasedOnChildren;
 
 public class SendFile extends Activity {
 
@@ -349,16 +349,11 @@ public class SendFile extends Activity {
 				
 			}
 		});
-<<<<<<< HEAD
-	
-=======
-		
->>>>>>> pr/6
+
 		sendFile.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-<<<<<<< HEAD
 
 				final TextView response = (TextView) findViewById(R.id.textView_response);
 
@@ -375,22 +370,20 @@ public class SendFile extends Activity {
 					e.printStackTrace();
 				}
 			
-			}
-		});
+//			}
+//		});
 	
-=======
-				
+
 				File inFile = new File(selectedFile);
 				File outFile = null;
 				String[] filePath = selectedFile.split("/");
 				String fileName = filePath[filePath.length - 1];
 				
-				encrypt(inFile,outFile,);
+				//encrypt(inFile,outFile,);
 				
-				uploadFile(inFile.getAbsolutePath(),,fileName);
+				//uploadFile(inFile.getAbsolutePath(),,fileName);
 			}
 		});
->>>>>>> pr/6
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -503,7 +496,7 @@ public class SendFile extends Activity {
 	         FileOutputStream fileOut = new FileOutputStream( f = new File (storageDirectory, fileName));
 	         System.out.println(f.getAbsolutePath());
 	         //ObjectOutputStream out = new ObjectOutputStream(fileOut);
-	         String tst = ("This is a test");	         
+	         String tst = ("This is a test file. If you can read this then the file is not encrypted.");	         
 	         fileOut.write(tst.getBytes());
 	         //out.writeObject(tst);
 	         //out.close();
@@ -519,6 +512,8 @@ public class SendFile extends Activity {
 	         String UUID_2 = selectedUserID;
 	         System.out.println("String UUID_2: " + UUID_2);
 	         System.out.println("Int UUID_2: " + Integer.parseInt(UUID_2));
+	         
+	         //Algorithm
 	         long combo = (Long.parseLong(UUID) * Long.parseLong(UUID_2));
 	         long x = Long.parseLong("1000000000000");
 	         while (combo < 0)
@@ -560,7 +555,13 @@ public class SendFile extends Activity {
 	         //getID(getApplicationContext(), selectedUser);
 	         selectedUser.toString();
 	         
-	         encrypt(f, c, secretKeySpec);	    
+	         encrypt(f, c, secretKeySpec);	 
+	         
+	         //sendfile
+	         
+	         	//upload file
+	         	//store filepath
+	         	//send GCM notification
 	         
 	         decrypt(c, d, secretKeySpec);
 	         

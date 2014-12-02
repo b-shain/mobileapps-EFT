@@ -38,8 +38,8 @@ android:fillViewport="true" >
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_alignParentLeft="true"
-          android:layout_below="@+id/textView_fileName"
-          android:layout_marginTop="21dp"
+          android:layout_below="@+id/btn_select_file"
+          android:layout_marginTop="25dp"
           android:background="@color/white"
           android:textColor="@color/Black" >
       </ListView>
@@ -49,8 +49,8 @@ android:fillViewport="true" >
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_alignParentLeft="true"
-          android:layout_below="@+id/btn_select_file"
-          android:layout_marginTop="23dp"
+          android:layout_below="@+id/txtVwSendFileWelcome"
+          android:layout_marginTop="25dp"
           android:text="Please Select A File to Send to A User: "
           android:textAppearance="?android:attr/textAppearanceLarge"
           android:textColor="@color/White" />
@@ -60,8 +60,8 @@ android:fillViewport="true" >
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_alignParentLeft="true"
-          android:layout_below="@+id/txtVwSendFileWelcome"
-          android:layout_marginTop="21dp"
+          android:layout_below="@+id/textView_fileName"
+          android:layout_marginTop="25dp"
           android:text="Select File" />
 
             <ListView
@@ -70,7 +70,7 @@ android:fillViewport="true" >
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/btn_select_friend"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="25dp"
                 android:background="@color/white"
                 android:textColor="@color/Black" >
             </ListView>
@@ -81,7 +81,7 @@ android:fillViewport="true" >
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textView_friendName"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="25dp"
                 android:text="Select Friend" />
 
             <Button
@@ -90,7 +90,7 @@ android:fillViewport="true" >
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/friend_listview"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="25dp"
                 android:text="Send File" />
 
             <TextView
@@ -99,8 +99,7 @@ android:fillViewport="true" >
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/btn_sendFile"
-                android:layout_marginTop="26dp"
-                android:text="Response Message:"
+                android:layout_marginTop="25dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/White" />
 

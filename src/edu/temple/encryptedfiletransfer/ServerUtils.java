@@ -295,6 +295,48 @@ import android.util.Log;
 			return message;
 	    }
 	    
+  
+	    static String associateFriends(final Context context, String userName1, String userName2, String uniqueID1, String uniqueID2) {
+	        String serverUrl = SERVER_URL + "associateFriends.php";
+	        Map<String, String> params = new HashMap<String, String>();     
+	        params.put("UserName_1", userName1);
+	        params.put("UserName_2", userName2);
+	        params.put("Unique_ID_1", uniqueID1);
+	        params.put("Unique_ID_2", uniqueID2);
+	         
+	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {
+	            Log.d(TAG, "Attempt #" + i + " to insert association");
+	            try {
+	            	displayMessage(context, " server is associating");
+	            	String response = post(serverUrl, params);
+	            	
+		            String message = "These users have been associated.";
+	                Utilities.displayMessage(context, message);
+	                return response;
+	            } catch (IOException e) {
+	                Log.e(TAG, "Failed to associate users on attempt " + i + ":" + e);
+	                if (i == MAX_ATTEMPTS) {
+	                    break;
+	                }
+	                try {
+	                    Log.d(TAG, "Sleeping for " + backoff + " ms before retry");
+	                    Thread.sleep(backoff);
+	                } catch (InterruptedException e1) {
+	                    // Activity finished before we complete - exit.
+	                    Log.d(TAG, "Thread interrupted: abort remaining retries!");
+	                    Thread.currentThread().interrupt();
+	                    return "error";
+	                }
+	                // increase back-off exponentially
+	                backoff *= 2;
+	            }
+	        }
+	        String message = "server_error";
+	        Utilities.displayMessage(context, message);
+			return message;
+	    }
+	    
 	    
 	    
 	    

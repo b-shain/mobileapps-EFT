@@ -1,7 +1,12 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:id="@+id/scrollview"
+android:fillViewport="true" >
+<RelativeLayout 
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/locks"
     tools:context="${relativePackage}.${activityClass}" >
     
@@ -17,38 +22,38 @@
         android:textColor="@color/white"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/textView_nfc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/txtVwAddFriendWelcome"
-        android:layout_below="@+id/txtVwAddFriendWelcome"
-        android:layout_marginTop="68dp"
-        android:text="DEFAULT TEXT IS HERE"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+            <ListView
+                android:id="@+id/friend_listview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/textView_nfc"
+                android:layout_marginTop="25dp"
+                android:background="@color/white"
+                android:textColor="@color/Black" >
+            </ListView>
 
-    <EditText
-        android:id="@+id/editText_nfc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/textView_nfc"
-        android:layout_below="@+id/textView_nfc"
-        android:layout_marginTop="31dp"
-        android:ems="10"
-        android:text="DEFAULT" >
+            <TextView
+                android:id="@+id/textView_nfc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/txtVwAddFriendWelcome"
+                android:layout_marginTop="25dp"
+                android:text="Here is your list of friends:"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/White" />
 
-        <requestFocus />
-    </EditText>
-
-    <ListView
-        android:id="@+id/lstVwAddFriend"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/txtVwAddFriendWelcome"
-        android:layout_marginTop="162dp" >
-
-    </ListView>
- 
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/friend_listview"
+                android:layout_marginTop="41dp"
+                android:text="To add a new friend, hold your NFC enabled device next to another NFC enabled device on this screen and tap the screen when requested by Android Beam."
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/White" />
 
 </RelativeLayout>
+ </ScrollView>
