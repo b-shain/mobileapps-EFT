@@ -50,7 +50,7 @@ import android.util.Log;
 	            	//TODO create non-hardcoded string
 	            	displayMessage(context, "server is registering");
 	            	String response = post(serverUrl, params);
-	            	
+	            	System.out.println(response);
 	            	//These lines are for registering the device with GCM, which is handled elsewhere now
 	                //GCMRegistrar.setRegisteredOnServer(context, true);
 	            	
@@ -84,37 +84,37 @@ import android.util.Log;
 	        Utilities.displayMessage(context, message);
 	    }
 	 
-	    /**
-	     * Unregister this account/device pair within the server.
-	     */
-	    static void unregister(final Context context, final String GCM_Reg_ID) {
-	        Log.i(TAG, "unregistering device (GCM_Reg_ID = " + GCM_Reg_ID + ")");
-	        String serverUrl = SERVER_URL + "/unregister";
-	        Map<String, String> params = new HashMap<String, String>();
-	        params.put("GCM_Reg_ID", GCM_Reg_ID);
-	        try {
-	            post(serverUrl, params);
-	            
-	            //This line is for un-registering the device with GCM, which is not handled currently, but should be handled elsewhere
-	            //GCMRegistrar.setRegisteredOnServer(context, false);
-	            
-	            //String message = context.getString(R.string.server_unregistered);
-		        //TODO create non-hardcoded string
-	            String message = "This device has been unregistered.";
-	            Utilities.displayMessage(context, message);
-	        } catch (IOException e) {
-	            // At this point the device is unregistered from GCM, but still
-	            // registered in the server.
-	            // We could try to unregister again, but it is not necessary:
-	            // if the server tries to send a message to the device, it will get
-	            // a "NotRegistered" error message and should unregister the device.
-	            //String message = context.getString(R.string.server_unregister_error,e.getMessage());
-		        
-	        	//TODO create non-hardcoded string
-	        	String message = "server_unregister_error";
-	            Utilities.displayMessage(context, message);
-	        }
-	    }
+//	    /**
+//	     * Unregister this account/device pair within the server.
+//	     */
+//	    static void unregister(final Context context, final String GCM_Reg_ID) {
+//	        Log.i(TAG, "unregistering device (GCM_Reg_ID = " + GCM_Reg_ID + ")");
+//	        String serverUrl = SERVER_URL + "/unregister";
+//	        Map<String, String> params = new HashMap<String, String>();
+//	        params.put("GCM_Reg_ID", GCM_Reg_ID);
+//	        try {
+//	            post(serverUrl, params);
+//	            
+//	            //This line is for un-registering the device with GCM, which is not handled currently, but should be handled elsewhere
+//	            //GCMRegistrar.setRegisteredOnServer(context, false);
+//	            
+//	            //String message = context.getString(R.string.server_unregistered);
+//		        //TODO create non-hardcoded string
+//	            String message = "This device has been unregistered.";
+//	            Utilities.displayMessage(context, message);
+//	        } catch (IOException e) {
+//	            // At this point the device is unregistered from GCM, but still
+//	            // registered in the server.
+//	            // We could try to unregister again, but it is not necessary:
+//	            // if the server tries to send a message to the device, it will get
+//	            // a "NotRegistered" error message and should unregister the device.
+//	            //String message = context.getString(R.string.server_unregister_error,e.getMessage());
+//		        
+//	        	//TODO create non-hardcoded string
+//	        	String message = "server_unregister_error";
+//	            Utilities.displayMessage(context, message);
+//	        }
+//	    }
 	 
 	    /**
 	     * Login to the server.
@@ -166,7 +166,7 @@ import android.util.Log;
 	        }
 	        //String message = context.getString(R.string.server_register_error,MAX_ATTEMPTS);
 	        //TODO create non-hardcoded string
-	        String message = "server_register_error";
+	        String message = "server_login_error";
 	        Utilities.displayMessage(context, message);
 			return message;
 	    }
@@ -344,6 +344,48 @@ import android.util.Log;
 	        params.put("UserName_1", userName1);
 	        params.put("UserName_2", userName2);
 	        params.put("File_URL", fileUrl);
+	         
+	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {
+	            Log.d(TAG, "Attempt #" + i + " to send notification");
+	            try {
+	            	displayMessage(context, " server is sending notification");
+	            	String response = post(serverUrl, params);
+	            	
+		            String message = "These notification has been sent.";
+	                Utilities.displayMessage(context, message);
+	                return response;
+	            } catch (IOException e) {
+	                Log.e(TAG, "Failed to send notification on attempt " + i + ":" + e);
+	                if (i == MAX_ATTEMPTS) {
+	                    break;
+	                }
+	                try {
+	                    Log.d(TAG, "Sleeping for " + backoff + " ms before retry");
+	                    Thread.sleep(backoff);
+	                } catch (InterruptedException e1) {
+	                    // Activity finished before we complete - exit.
+	                    Log.d(TAG, "Thread interrupted: abort remaining retries!");
+	                    Thread.currentThread().interrupt();
+	                    return "error";
+	                }
+	                // increase back-off exponentially
+	                backoff *= 2;
+	            }
+	        }
+	        String message = "server_error";
+	        Utilities.displayMessage(context, message);
+			return message;
+	    }
+	    
+	    
+	    static String sendReceivedNotification(final Context context, String userName1, String userName2) {
+	        String serverUrl = SERVER_URL + "sendReceivedNotification.php";
+	        Map<String, String> params = new HashMap<String, String>();     
+	        //Username 1 is the sender
+	        params.put("UserName_1", userName1);
+	        //Username 2 is the recipient
+	        params.put("UserName_2", userName2);
 	         
 	        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
 	        for (int i = 1; i <= MAX_ATTEMPTS; i++) {

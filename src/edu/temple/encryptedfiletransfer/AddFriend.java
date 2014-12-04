@@ -1,18 +1,16 @@
 package edu.temple.encryptedfiletransfer;
 
+import static edu.temple.encryptedfiletransfer.ServerUtils.associateFriends;
 import static edu.temple.encryptedfiletransfer.ServerUtils.getFriends;
 import static edu.temple.encryptedfiletransfer.Utilities.TAG;
-
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import edu.temple.encryptedfiletransfer.SendFile.ExtendedArrayAdapter;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -30,7 +28,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,13 +35,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import static edu.temple.encryptedfiletransfer.ServerUtils.getFriends;
-import static edu.temple.encryptedfiletransfer.ServerUtils.associateFriends;
 
+@SuppressLint("HandlerLeak")
 public class AddFriend extends Activity implements CreateNdefMessageCallback, OnNdefPushCompleteCallback{
 	
 	TextView txtUserMessage, txtNFC;
@@ -66,7 +61,13 @@ public class AddFriend extends Activity implements CreateNdefMessageCallback, On
 		@Override
 		public void handleMessage(Message msg) {		 
 			String friendsListResponse = (String) msg.obj;
-			if(friendsListResponse == "")
+				try {
+					jObj = new JSONObject(friendsListResponse);
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+				}
+
+			if(!jObj.isNull("message"))
 			{
 				//they are not registered OR they entered incorrect username/password
 				Toast.makeText(getApplicationContext(), "You have no friends =(", Toast.LENGTH_LONG).show();	            
@@ -96,10 +97,9 @@ public class AddFriend extends Activity implements CreateNdefMessageCallback, On
 			    friendListview.setAdapter(friendAdapter);
 				friendListview.setVisibility(View.VISIBLE);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Toast.makeText(getApplicationContext(), "The Friends List Response was : " + friendsListResponse + ".", Toast.LENGTH_LONG).show();	            
+			//Toast.makeText(getApplicationContext(), "The Friends List Response was : " + friendsListResponse + ".", Toast.LENGTH_LONG).show();	            
 			}
 		}					
 	};	
@@ -182,24 +182,6 @@ public class AddFriend extends Activity implements CreateNdefMessageCallback, On
 		friendsListTask.execute(null, null, null);
 				
 
-//			    friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
-//			    friendListview.setAdapter(friendAdapter);
-//
-//			    friendListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//			      @Override
-//			      public void onItemClick(AdapterView<?> parent, final View view,
-//			          int position, long id) {
-//			        //final String friendItem = (String) parent.getItemAtPosition(position);
-//			        //txtFriend.setText("You have selected " + friendItem + " as the recipient.");
-//			        //selectedUser = friendItem;
-//			        //System.out.println(friendItem + " was clicked");
-//			        //friendListview.setVisibility(View.GONE);
-//			      }
-//
-//			    });			
-//			    friendListview.setVisibility(View.VISIBLE);
-
 	}
 	
 	@Override
@@ -208,18 +190,6 @@ public class AddFriend extends Activity implements CreateNdefMessageCallback, On
         setIntent(intent);
     }
 	
-	
-//	/**
-//     * Parses the NDEF Message from the intent and prints to the TextView
-//     */
-//    void processIntent(Intent intent) {
-//        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
-//                NfcAdapter.EXTRA_NDEF_MESSAGES);
-//        // only one message sent during the beam
-//        NdefMessage msg = (NdefMessage) rawMsgs[0];
-//        // record 0 contains the MIME type, record 1 is the AAR, if present
-//        txtNFC.setText(new String(msg.getRecords()[0].getPayload()));
-//    }
 
     /**
      * Creates a custom MIME type encapsulated in an NDEF record
@@ -252,13 +222,13 @@ public class AddFriend extends Activity implements CreateNdefMessageCallback, On
 		         Parcelable[] rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 		 
 		         NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
-		         Toast.makeText(this, new String(message.getRecords()[0].getPayload()), Toast.LENGTH_LONG).show();
+		         //Toast.makeText(this, new String(message.getRecords()[0].getPayload()), Toast.LENGTH_LONG).show();
 		        
 		         String temp = new String(message.getRecords()[0].getPayload());
 		         Log.i("Payload: ", temp);	         
 				 Log.i("UUID: ", friendUUID = temp.split(",")[0]);
 		         Log.i("Username: ", friendUserName = temp.split(",")[1]);
-		         txtNFC.setText(new String(message.getRecords()[0].getPayload()));
+		         txtNFC.setText(temp.split(",")[1] + " has successfully been added as a friend.");
 		         
 		         //brandon
 		         addFriendTask = new AsyncTask<Void, Void, Void>() {
@@ -395,6 +365,40 @@ public class AddFriend extends Activity implements CreateNdefMessageCallback, On
         // A handler is needed to send messages to the activity when this
         // callback occurs, because it happens from a binder thread
         nfcHandler.obtainMessage(MESSAGE_SENT).sendToTarget();
+ 		 friendList = new ArrayList<String>();
+//	       //brandon
+	         friendsListTask = new AsyncTask<Void, Void, Void>() {
+	             @Override
+	             protected Void doInBackground(Void... params) {              
+	             	Message msg = friendsListHandle.obtainMessage();
+	             	String message = getFriends(getApplicationContext(), userName);
+	             	//String message = logIn(getApplicationContext(), txtUsername.getText().toString(), txtPassword.getText().toString());
+	             	Log.e(TAG, message);
+	             	msg.obj = message;                	
+	  				friendsListHandle.sendMessage(msg);
+	                 return null;
+	             }
+	             @Override
+	             protected void onPostExecute(Void result) {
+	             	//brandon - Because AsyncTasks can only be used once
+	                 friendsListTask = null;
+	             }
+	         };
+	         
+	  		friendsListTask.execute(null, null, null);
+	  				friendListview.setVisibility(View.VISIBLE);
+
+	  			    friendAdapter = new ExtendedArrayAdapter(getApplicationContext(), R.layout.simple_list_item_1, friendList);
+	  			    friendListview.setAdapter(friendAdapter);
+
+	  			    friendListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+	  			      @Override
+	  			      public void onItemClick(AdapterView<?> parent, final View view,
+	  			          int position, long id) {
+	  			      }
+
+	  			    });			
 	}
 
 	 private final Handler nfcHandler = new Handler() {

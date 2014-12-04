@@ -4,8 +4,6 @@ import static edu.temple.encryptedfiletransfer.ServerUtils.getFriends;
 import static edu.temple.encryptedfiletransfer.ServerUtils.getID;
 import static edu.temple.encryptedfiletransfer.ServerUtils.sendDownloadNotification;
 import static edu.temple.encryptedfiletransfer.Utilities.TAG;
-
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -13,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -25,17 +22,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -56,6 +51,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+@SuppressLint({ "HandlerLeak", "TrulyRandom" })
 public class SendFile extends Activity {
 	
 	int serverResponseCode = 0;
@@ -88,9 +84,15 @@ public class SendFile extends Activity {
 		@Override
 		public void handleMessage(Message msg) {		 
 			String friendsListResponse = (String) msg.obj;
-			if(friendsListResponse == "")
+			try {
+				jObj = new JSONObject(friendsListResponse);
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
+
+		if(!jObj.isNull("message"))
 			{
-				//they are not registered OR they entered incorrect username/password
+				//they do not have any friends
 				Toast.makeText(getApplicationContext(), "You have no friends =(", Toast.LENGTH_LONG).show();	            
 			}
 			else
@@ -119,10 +121,9 @@ public class SendFile extends Activity {
 			    friendListview.setAdapter(friendAdapter);
 				friendListview.setVisibility(View.VISIBLE);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Toast.makeText(getApplicationContext(), "The Friends List Response was : " + friendsListResponse + ".", Toast.LENGTH_LONG).show();	            
+			//Toast.makeText(getApplicationContext(), "The Friends List Response was : " + friendsListResponse + ".", Toast.LENGTH_LONG).show();	            
 			}
 		}					
 	};	
@@ -134,7 +135,7 @@ public class SendFile extends Activity {
 			if(idResponse == "")
 			{
 				//This should never trigger
-				Toast.makeText(getApplicationContext(), "No ID was found for that user.", Toast.LENGTH_LONG).show();	            
+				//Toast.makeText(getApplicationContext(), "No ID was found for that user.", Toast.LENGTH_LONG).show();	            
 			}
 			else
 			{
@@ -156,10 +157,9 @@ public class SendFile extends Activity {
 			    }
 			    selectedUserID.toString();
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Toast.makeText(getApplicationContext(), "The ID Response was : " + idResponse + ".", Toast.LENGTH_LONG).show();	            
+			//Toast.makeText(getApplicationContext(), "The ID Response was : " + idResponse + ".", Toast.LENGTH_LONG).show();	            
 			}
 		}					
 	};	
@@ -167,16 +167,16 @@ public class SendFile extends Activity {
     final Handler notificationHandle = new Handler(){
 		@Override
 		public void handleMessage(Message msg) {		 
-			String notificationResponse = (String) msg.obj;			
-			Toast.makeText(getApplicationContext(), "The Notification Response was : " + notificationResponse + ".", Toast.LENGTH_LONG).show();	            			
+			//String notificationResponse = (String) msg.obj;			
+			//Toast.makeText(getApplicationContext(), "The Notification Response was : " + notificationResponse + ".", Toast.LENGTH_LONG).show();	            			
 		}					
 	};	
 
     final Handler uploadHandle = new Handler(){
 		@Override
 		public void handleMessage(Message msg) {		 
-			String uploadResponse = (String) msg.obj;			
-			Toast.makeText(getApplicationContext(), "The Upload Response was : " + uploadResponse + ".", Toast.LENGTH_LONG).show();	            			
+			//String uploadResponse = (String) msg.obj;			
+			//Toast.makeText(getApplicationContext(), "The Upload Response was : " + uploadResponse + ".", Toast.LENGTH_LONG).show();	            			
 		}					
 	};	
 	
@@ -223,7 +223,7 @@ public class SendFile extends Activity {
 			@Override
 			public void onClick(View v) {
 				//File[] testFiles = storageDirectory.listFiles();
-				
+		        response.setText("");
 	         
 		         try {
 		        	 //This is to create a test file to be encrypted in case there are none in the application directory
@@ -237,7 +237,6 @@ public class SendFile extends Activity {
 				         fileOut.write(tst.getBytes());
 				         fileOut.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		         //out.writeObject(tst);
@@ -328,7 +327,7 @@ public class SendFile extends Activity {
 			@Override
 			public void onClick(View v) {
 				//File[] testFiles = storageDirectory.listFiles();
-				
+		        response.setText("");
 				final TextView txtFriend = (TextView) findViewById(R.id.textView_friendName);
 				friendListview = (ListView) findViewById(R.id.friend_listview);
 				friendList = new ArrayList<String>();
@@ -394,7 +393,6 @@ public class SendFile extends Activity {
 						response.setText("Please be sure to select a recipient and file to be sent.");
 					}
 				} catch (NoSuchAlgorithmException | NoSuchPaddingException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -561,17 +559,8 @@ public class SendFile extends Activity {
 	         	         
 	         SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 	         
-	         final String decFileName = fileName;
- 	         File decrypFile = new File (storageDirectory, decFileName);
-	         
 	         final String encFileName = "(Encrypted)" + fileName;
  	         File encFile = new File (storageDirectory, encFileName);
-	         
-	         //final String encFileName = /*uri.getQueryParameter("filename")*/ "test_copy" + ".txt";
-	         //File c = new File (storageDirectory, encFileName);
-	         
-	         //final String decFileName = /*uri.getQueryParameter("filename")*/ "test_dec_copy" + ".txt";
-	         //File d = new File (storageDirectory, decFileName);
 	         
 	         //Select UUID from Associated User where Username = friendName
 	         
@@ -620,28 +609,27 @@ public class SendFile extends Activity {
 		        };
 		        
 		        notificationTask.execute(null, null, null);
-	         
+		        response.setText("The file you have selected has successfully been encrypted and sent to the selected user. You can select a different file and/or user if you would like to send another file.");
+				//Toast.makeText(getApplicationContext(), "The file you have selected has successfully been encrypted and sent to the selected user.", Toast.LENGTH_LONG).show();	            		        
+		        
 	         //decrypt(c, d, secretKeySpec);
 	         
 	      }catch(IOException i)
 	      {
 	          i.printStackTrace();
 	      } catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		File storageDirectory = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));			
-		
+				
         }
 	      
         }
 		
 	}
 	
+	@SuppressLint("TrulyRandom")
 	public void encrypt(File in, File out, SecretKeySpec aeskeySpec) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
 	    aesCipher.init(Cipher.ENCRYPT_MODE, aeskeySpec);
 	   
@@ -704,17 +692,6 @@ public class SendFile extends Activity {
 	 		            protected Void doInBackground(Void... params) {              
 	 		            	Message msg = uploadHandle.obtainMessage();
 	 		            	               	
-//	 						uploadHandle.sendMessage(msg);
-//	 		                return null;
-//	 		            }
-//	 		            @Override
-//	 		            protected void onPostExecute(Void result) {
-//	 		            	//brandon - Because AsyncTasks can only be used once
-//	 		                uploadTask = null;
-//	 		            }
-//	 		        };
-	 		        
-//	 				uploadTask.execute(null, null, null);
 	 		            	 try {
 	 			                  
 	                   // open a URL connection to the Servlet

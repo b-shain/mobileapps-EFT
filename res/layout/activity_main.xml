@@ -49,7 +49,7 @@
         android:textColor="#F8F8F8"
         android:textColorHint="#F8F8F8" >
 
-        <requestFocus />
+
     </EditText>
 
     <Button

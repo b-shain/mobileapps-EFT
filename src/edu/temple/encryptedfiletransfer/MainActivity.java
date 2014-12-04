@@ -10,6 +10,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 //this will be the login activity. 
+@SuppressLint("HandlerLeak")
 public class MainActivity extends Activity {
 	
 	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -60,7 +62,7 @@ public class MainActivity extends Activity {
 				//they are not registered OR they entered incorrect username/password
 				Toast.makeText(getApplicationContext(), "Please register if you have not already, or you entered an incorrect username/password combination.", Toast.LENGTH_LONG).show();	            
 			}
-			else
+			else if(!loginResponse.equals("server_login_error"))
 			{
 			// Brett - transition user to home screen once user has been
 			// logged in successfully
@@ -72,7 +74,12 @@ public class MainActivity extends Activity {
 			successfulLoginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(successfulLoginIntent);
 			finish(); //so the user can't go back to the login
-			Toast.makeText(getApplicationContext(), "The Login Response was : " + loginResponse + ". Which should be your UserID", Toast.LENGTH_LONG).show();	            
+			//Toast.makeText(getApplicationContext(), "The Login Response was : " + loginResponse + ". Which should be your UserID", Toast.LENGTH_LONG).show();	            
+			Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_LONG).show();	            
+			}
+			else
+			{
+				Toast.makeText(getApplicationContext(), "There was an error logging in.", Toast.LENGTH_LONG).show();	            
 			}
 		}					
 	};	
@@ -86,14 +93,6 @@ public class MainActivity extends Activity {
 				//That user name is not registered to a user
 				//store user and register
 			
-//				fields[0] = message;
-//            	fields[1] = txtNewUserFName.getText().toString();
-//            	fields[2] = txtNewUserLName.getText().toString();
-//            	fields[3] = txtNewUserEmail.getText().toString();
-//            	fields[4] = txtNewUserUsername.getText().toString();
-//            	fields[5] = txtNewUserPassword.getText().toString();
-//				
-				
 			String feedback = registerResponse[1].toString() + " " + registerResponse[2].toString() +
 					" , you have successfully registered!";
 			
@@ -160,8 +159,16 @@ public class MainActivity extends Activity {
 		            }
 		        };
 		        
+		        if(txtUsername.getText().toString() != null && !txtUsername.getText().toString().equals("") &&
+		           txtPassword.getText().toString() != null && !txtPassword.getText().toString().equals(""))
+		        {
 				loginTask.execute(null, null, null);
+		        }
+		        else
+		        {
+					Toast.makeText(getApplicationContext(), "Please enter BOTH a username and password to login.", Toast.LENGTH_LONG).show();	            
 
+		        }
 				//Brandon -- I relocated your code brett to be executed within the Login Handler
 
 			}
@@ -170,9 +177,9 @@ public class MainActivity extends Activity {
 		// Brett - will handle when new user wants to register
 		btnRegister.setOnClickListener(new View.OnClickListener() {
 
+			@SuppressLint("InflateParams")
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 
 				// Brett- get activity_registration.xml view
 				LayoutInflater layoutInflater = (LayoutInflater) getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -186,7 +193,6 @@ public class MainActivity extends Activity {
 
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
 						popupWindow.dismiss();
 					}
 				});
@@ -211,7 +217,6 @@ public class MainActivity extends Activity {
 					public void onClick(View v) {
 
 						registerTask = new AsyncTask<Void, Void, Void>() {
-				            @SuppressWarnings({ "unused", "unused", "unused" })
 							@Override
 				            protected Void doInBackground(Void... params) {              
 				            	Message msg = registerHandle.obtainMessage();
@@ -242,7 +247,6 @@ public class MainActivity extends Activity {
 				        		        register(getApplicationContext(), txtNewUserFName.getText().toString(), txtNewUserLName.getText().toString(), txtNewUserUsername.getText().toString(),txtNewUserPassword.getText().toString(),txtNewUserEmail.getText().toString(),storedID);
 			        				}
 			        			} catch (IOException e) {
-			        				// TODO Auto-generated catch block
 			        				e.printStackTrace();
 			        			}
 				            	}
@@ -266,10 +270,21 @@ public class MainActivity extends Activity {
 				                registerTask = null;
 				            }
 				        };
-				        
+				        @SuppressWarnings("unused")
+						String usrName = txtNewUserFName.getText().toString();
+				        if(txtNewUserFName.getText().toString() != null && !txtNewUserFName.getText().toString().equals("") &&
+				        	txtNewUserLName.getText().toString() != null && !txtNewUserLName.getText().toString().equals("") &&
+				        	txtNewUserEmail.getText().toString() != null && !txtNewUserEmail.getText().toString().equals("") &&		
+				        	txtNewUserUsername.getText().toString() != null && !txtNewUserUsername.getText().toString().equals("") &&
+				        	txtNewUserPassword.getText().toString() != null && !txtNewUserPassword.getText().toString().equals("")
+				        		)
+				        {
 						registerTask.execute(null, null, null);
-						
-						
+				        }
+				        else
+				        {
+							Toast.makeText(getApplicationContext(), "All fields are required, so please be sure not to leave any of them empty.", Toast.LENGTH_LONG).show();	            	
+				        }
 						//Brandon -- I relocated your code brett to be executed within the Registration Handler
 
 					}
@@ -299,7 +314,8 @@ public class MainActivity extends Activity {
 	 }
 	
 	
-    private boolean checkPlayServices() {
+    @SuppressWarnings("unused")
+	private boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {

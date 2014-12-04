@@ -29,7 +29,7 @@ android:fillViewport="true" >
           android:layout_alignParentLeft="true"
           android:layout_below="@+id/listview"
           android:layout_marginTop="27dp"
-          android:text="Please Select A User To Send A File To:"
+          android:text="Please select a recipient:"
           android:textAppearance="?android:attr/textAppearanceLarge"
           android:textColor="@color/White" />
 
@@ -51,7 +51,7 @@ android:fillViewport="true" >
           android:layout_alignParentLeft="true"
           android:layout_below="@+id/txtVwSendFileWelcome"
           android:layout_marginTop="25dp"
-          android:text="Please Select A File to Send to A User: "
+          android:text="Please select a file to be sent: "
           android:textAppearance="?android:attr/textAppearanceLarge"
           android:textColor="@color/White" />
 
@@ -62,7 +62,7 @@ android:fillViewport="true" >
           android:layout_alignParentLeft="true"
           android:layout_below="@+id/textView_fileName"
           android:layout_marginTop="25dp"
-          android:text="Select File" />
+          android:text="Select File..." />
 
             <ListView
                 android:id="@+id/friend_listview"
@@ -82,7 +82,7 @@ android:fillViewport="true" >
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textView_friendName"
                 android:layout_marginTop="25dp"
-                android:text="Select Friend" />
+                android:text="Select Friend..." />
 
             <Button
                 android:id="@+id/btn_sendFile"
@@ -100,10 +100,9 @@ android:fillViewport="true" >
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/btn_sendFile"
                 android:layout_marginTop="25dp"
+                android:text="Click on the &apos;Select File...&apos; and &apos;Select Friend...&apos; buttons to select the file you would like to send and the recipient of the file."
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/White" />
-
-
 
 </RelativeLayout>
  </ScrollView>
